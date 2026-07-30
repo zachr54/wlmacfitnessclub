@@ -1,0 +1,9 @@
+{
+  "name": "WLMAC Fitness Club",
+  "short_name": "WLMAC Fitness",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#060606",
+  "theme_color": "#060606",
+  "icons": [{ "src": "assets/wlmac-crest-t.png", "sizes": "512x512", "type": "image/png" }]
+}

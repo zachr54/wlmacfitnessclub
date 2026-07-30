@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/tokens/fonts.css">
+<link rel="stylesheet" href="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/tokens/colors.css">
+<link rel="stylesheet" href="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/tokens/typography.css">
+<link rel="stylesheet" href="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/tokens/spacing.css">
+<link rel="stylesheet" href="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/tokens/effects.css">
+<link rel="stylesheet" href="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/styles.css">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css">
+<script src="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/_ds_bundle.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+body{margin:0;background:#060606;color:var(--white);font-family:var(--font-body)}
+a{color:var(--red-500);text-decoration:none}
+a:hover{color:var(--white)}
+::-webkit-scrollbar{width:0;height:0}
+*{scrollbar-width:none}
+@keyframes wl-pulse{0%{box-shadow:0 0 0 0 rgba(226,27,60,.55)}70%{box-shadow:0 0 0 9px rgba(226,27,60,0)}100%{box-shadow:0 0 0 0 rgba(226,27,60,0)}}
+@keyframes wl-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes wl-drop{from{opacity:0;transform:translateY(-70px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+
+<div style="width:100%;max-width:560px;margin:0 auto;height:100dvh;display:flex;flex-direction:column;background:var(--black);overflow:hidden;font-family:var(--font-body);position:relative">
+
+<sc-if value="{{ isAuth }}">
+<div style="height:100%;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 32px) 24px calc(env(safe-area-inset-bottom) + 32px);display:flex;flex-direction:column">
+
+<sc-if value="{{ atWelcome }}">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;animation:wl-rise .3s var(--ease-standard)">
+<img src="assets/wlmac-crest-t.png" alt="WLMAC Fitness Club crest" style="width:158px;height:158px;object-fit:contain;margin-bottom:20px">
+<div style="font-family:var(--font-display);font-size:44px;line-height:.98;text-transform:uppercase;letter-spacing:var(--tracking-tight);color:var(--white)">Show up.<br>WORK HARD.<br><span style="color: var(--red-500);">Repeat.</span></div>
+<div style="width:44px;height:3px;background:var(--red-600);margin:18px 0 6px"></div>
+<p style="margin:0;font-size:15px;line-height:1.5;color:var(--text-secondary);max-width:270px">Weekly open lifts, plus additional competitions. Open to all skill and experience levels!</p>
+</div>
+<div style="display:grid;gap:12px;margin-top:32px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" onClick="{{ goSignup }}" hint-size="100%,54px">Create account</x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" variant="secondary" onClick="{{ goLogin }}" hint-size="100%,54px">I already have one</x-import>
+<p style="margin:6px 0 0;text-align:center;font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">WLMAC 2026–27 · Fitness Club</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ atLogin }}">
+<div style="animation:wl-rise .3s var(--ease-standard)">
+<button onClick="{{ goWelcome }}" style="background:none;border:none;padding:0;margin-bottom:22px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Back</button>
+<div style="font-family:var(--font-display);font-size:40px;line-height:1;text-transform:uppercase;color:var(--white)">Log in</div>
+<p style="margin:10px 0 26px;font-size:15px;color:var(--text-secondary)">Members and execs use the same door.</p>
+<div style="display:grid;gap:16px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="School email" placeholder="you@wlmac.ca" value="{{ email }}" onChange="{{ setEmail }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Password" type="password" placeholder="••••••••" value="{{ pass }}" onChange="{{ setPass }}" hint-size="100%,72px"></x-import>
+<sc-if value="{{ hasErr }}"><p style="margin:0;font-size:14px;color:var(--status-danger)">{{ err }}</p></sc-if>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" onClick="{{ doLogin }}" hint-size="100%,54px">Log in</x-import>
+</div>
+<sc-if value="{{ showDemoLogins }}">
+<div style="margin-top:26px;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Demo logins</span>
+<div style="margin-top:12px;display:flex;flex-direction:column;gap:10px">
+<button onClick="{{ fillExec }}" style="text-align:left;background:var(--ink-800);border:1px solid var(--ink-700);border-radius:var(--radius-sm);padding:11px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px">
+<span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">Exec — Priya</span><span style="font-size:12.5px;color:var(--gray-400)">priya@wlmac.ca / lift2027</span></span>
+<i class="ph-bold ph-arrow-right" style="font-size:16px;color:var(--red-500)"></i>
+</button>
+<button onClick="{{ fillMember }}" style="text-align:left;background:var(--ink-800);border:1px solid var(--ink-700);border-radius:var(--radius-sm);padding:11px 13px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px">
+<span style="display:flex;flex-direction:column;gap:2px"><span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">Member — Sam</span><span style="font-size:12.5px;color:var(--gray-400)">sam@wlmac.ca / squat123</span></span>
+<i class="ph-bold ph-arrow-right" style="font-size:16px;color:var(--red-500)"></i>
+</button>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ atSignup }}">
+<div style="animation:wl-rise .3s var(--ease-standard)">
+<button onClick="{{ signupBack }}" style="background:none;border:none;padding:0;margin-bottom:20px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Back</button>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--red-500)">Step {{ step }} of 3</span>
+<span style="flex:1;height:3px;background:var(--ink-700);position:relative;overflow:hidden"><span style="position:absolute;inset:0 auto 0 0;background:var(--red-600);width:{{ stepPct }}%;transition:width .25s var(--ease-standard)"></span></span>
+</div>
+<div style="font-family:var(--font-display);font-size:34px;line-height:1.02;text-transform:uppercase;color:var(--white);margin-bottom:6px">{{ stepTitle }}</div>
+<p style="margin:0 0 24px;font-size:14.5px;color:var(--text-secondary)">{{ stepSub }}</p>
+
+<sc-if value="{{ step1 }}">
+<div style="display:grid;gap:16px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Full name" placeholder="Sam Okafor" value="{{ suName }}" onChange="{{ setSuName }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="School email" placeholder="you@wlmac.ca" value="{{ suEmail }}" onChange="{{ setSuEmail }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Select" label="Grade" options="{{ grades }}" value="{{ suGrade }}" onChange="{{ setSuGrade }}" hint-size="100%,72px"></x-import>
+</div>
+</sc-if>
+
+<sc-if value="{{ step2 }}">
+<div style="display:grid;gap:16px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Password" type="password" placeholder="8 characters or more" value="{{ suPass }}" onChange="{{ setSuPass }}" helper="You’ll use this every time you check the count." hint-size="100%,92px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Emergency contact name" placeholder="Parent or guardian" value="{{ suEcName }}" onChange="{{ setSuEcName }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Emergency contact phone" type="tel" placeholder="416 555 0134" value="{{ suEcPhone }}" onChange="{{ setSuEcPhone }}" hint-size="100%,72px"></x-import>
+</div>
+</sc-if>
+
+<sc-if value="{{ step3 }}">
+<div style="display:flex;flex-direction:column;gap:14px">
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;max-height:150px;overflow-y:auto">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Waiver &amp; weight-room etiquette</span>
+<p style="margin:10px 0 0;font-size:13.5px;line-height:1.6;color:var(--text-secondary)">Lifting carries risk. You confirm you are medically clear to train and that WLMAC, its staff and its execs are not liable for injury. You will warm up, use collars, and ask for a spotter on max attempts. You will re-rack every plate, wipe the bench, and keep chalk in the bowl. You will not film anyone without asking. Every skill level is welcome in this room — no coaching anyone who did not ask for it, no comments on anyone’s body or numbers.</p>
+</div>
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:14px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Checkbox" label="I have read and accept the waiver." checked="{{ suWaiver }}" onChange="{{ setSuWaiver }}" hint-size="100%,22px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Checkbox" label="I agree to the code of conduct." checked="{{ suCoc }}" onChange="{{ setSuCoc }}" hint-size="100%,22px"></x-import>
+</div>
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:10px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Switch" label="Show my name in Who’s here" checked="{{ suVisible }}" onChange="{{ setSuVisible }}" hint-size="100%,22px"></x-import>
+<p style="margin:0;font-size:13px;line-height:1.5;color:var(--text-tertiary)">Off by default for everyone who skips this. You still count toward the number — only your name is hidden.</p>
+</div>
+<sc-if value="{{ hasErr }}"><p style="margin:0;font-size:14px;color:var(--status-danger)">{{ err }}</p></sc-if>
+</div>
+</sc-if>
+
+<div style="display:grid;margin-top:24px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" disabled="{{ nextBlocked }}" onClick="{{ signupNext }}" hint-size="100%,54px">{{ stepCta }}</x-import>
+</div>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ isApp }}" hint-placeholder-val="{{ true }}">
+
+<div style="flex:none;padding:calc(env(safe-area-inset-top) + 14px) 18px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--ink-700);background:var(--black)">
+<div style="display:flex;align-items:center;gap:11px">
+<img src="assets/wlmac-crest-t.png" alt="WLMAC crest" style="width:36px;height:36px;object-fit:contain">
+<div style="display:flex;flex-direction:column;gap:2px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:15px;line-height:1;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--white)">Fitness Club</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:10.5px;line-height:1;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">{{ roleLine }}</span>
+</div>
+</div>
+<button onClick="{{ goProfile }}" style="width:38px;height:38px;flex:none;border-radius:var(--radius-pill);border:2px solid var(--red-600);background:var(--ink-800);color:var(--white);font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);cursor:pointer;overflow:hidden;padding:0;position:relative">
+<span style="position:relative;z-index:0">{{ initials }}</span>
+<span style="position:absolute;inset:0;z-index:1;border-radius:50%;background-size:cover;background-position:center;background-image:{{ avatarBg }}"></span>
+</button>
+</div>
+
+<div style="flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 18px 28px">
+
+<sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;flex-direction:column;gap:26px;animation:wl-rise .28s var(--ease-standard)">
+
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:18px 18px 16px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">In the weight room</span>
+<span style="display:inline-flex;align-items:center;gap:6px;font-family:var(--font-heading);font-weight:700;font-size:10.5px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-300)"><i style="width:7px;height:7px;border-radius:50%;background:var(--red-500);animation:wl-pulse 2.4s var(--ease-out) infinite"></i>Live</span>
+</div>
+
+<sc-if value="{{ gPlates }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;align-items:baseline;gap:9px;margin:12px 0 16px">
+<span style="font-family:var(--font-display);font-size:86px;line-height:.82;font-variant-numeric:tabular-nums;color:{{ zoneColor }}">{{ count }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:20px;color:var(--gray-500);font-variant-numeric:tabular-nums;white-space:nowrap">/ {{ cap }}</span>
+</div>
+<div style="display:flex;gap:3px;height:34px;align-items:flex-end">
+<sc-for list="{{ plates }}" as="p" hint-placeholder-count="20">
+<span style="flex:1;border-radius:1px;height:{{ p.h }};background:{{ p.bg }};transition:height .3s var(--ease-standard),background .3s var(--ease-standard)"></span>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ gBar }}">
+<div style="display:flex;align-items:baseline;gap:9px;margin:12px 0 14px">
+<span style="font-family:var(--font-display);font-size:86px;line-height:.82;font-variant-numeric:tabular-nums;color:{{ zoneColor }}">{{ count }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:20px;color:var(--gray-500);font-variant-numeric:tabular-nums;white-space:nowrap">/ {{ cap }}</span>
+</div>
+<div style="height:12px;background:var(--ink-700);border-radius:var(--radius-sm);overflow:hidden">
+<span style="display:block;height:100%;width:{{ fillPct }}%;background:{{ zoneColor }};transition:width .35s var(--ease-standard)"></span>
+</div>
+<div style="display:flex;justify-content:space-between;margin-top:7px;font-family:var(--font-heading);font-weight:600;font-size:10.5px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)"><span>Empty</span><span>{{ fillLabel }} full</span><span>Capacity {{ cap }}</span></div>
+</sc-if>
+
+<sc-if value="{{ gRing }}">
+<div style="display:flex;align-items:center;gap:20px;margin:16px 0 4px">
+<div style="width:132px;height:132px;flex:none;border-radius:50%;background:conic-gradient({{ zoneColor }} {{ ringDeg }}deg, var(--ink-700) 0deg);display:flex;align-items:center;justify-content:center;transition:background .35s var(--ease-standard)">
+<div style="width:104px;height:104px;border-radius:50%;background:var(--surface-card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px">
+<span style="font-family:var(--font-display);font-size:46px;line-height:1;font-variant-numeric:tabular-nums;color:{{ zoneColor }}">{{ count }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);color:var(--gray-500)">OF {{ cap }}</span>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px">
+<span style="font-family:var(--font-display);font-size:26px;line-height:1;text-transform:uppercase;color:{{ zoneColor }}">{{ zoneLabel }}</span>
+<span style="font-size:13.5px;line-height:1.45;color:var(--text-secondary)">{{ zoneNote }}</span>
+</div>
+</div>
+</sc-if>
+
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:13px;border-top:1px solid var(--ink-700)">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;padding:5px 12px;border-radius:var(--radius-pill);border:1px solid {{ zoneColor }};color:{{ zoneColor }}">{{ zoneLabel }}</span>
+<span style="font-size:12px;color:var(--gray-500);font-variant-numeric:tabular-nums">{{ stamp }}</span>
+</div>
+</div>
+
+<sc-if value="{{ showPresent }}">
+<div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Who’s here</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">{{ hiddenNote }}</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ present }}" as="m" hint-placeholder-count="5">
+<span style="display:flex;align-items:center;gap:8px;background:var(--ink-800);border:1px solid var(--ink-700);border-radius:var(--radius-pill);padding:5px 12px 5px 5px">
+<span style="width:26px;height:26px;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:.03em;color:var(--white)">{{ m.initials }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:13px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--gray-200)">{{ m.first }}</span>
+</span>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasNext }}">
+<div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Next up</span>
+<button onClick="{{ goSchedule }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--red-500)">Full schedule</button>
+</div>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.EventCard" title="{{ nextTitle }}" date="{{ nextDate }}" type="{{ nextType }}" location="{{ nextLoc }}" spotsLeft="{{ nextSpots }}" onSignUp="{{ nextOpen }}" hint-size="100%,180px"></x-import>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasTopPost }}">
+<div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">From the execs</span>
+<button onClick="{{ goBoard }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--red-500)">All posts</button>
+</div>
+<button onClick="{{ goBoard }}" style="width:100%;text-align:left;background:var(--surface-card);border:1px solid var(--ink-700);border-left:3px solid var(--red-600);border-radius:var(--radius-md);padding:15px;cursor:pointer">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:10.5px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--red-500)">{{ topPostAuthor }}</span>
+<span style="font-size:11.5px;color:var(--gray-500)">{{ topPostAgo }}</span>
+</div>
+<p style="margin:0;font-size:14.5px;line-height:1.5;color:var(--gray-200)">{{ topPostText }}</p>
+</button>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ tabBoard }}">
+<div style="animation:wl-rise .28s var(--ease-standard)">
+<div style="font-family:var(--font-display);font-size:38px;line-height:1;text-transform:uppercase;color:var(--white)">Board</div>
+<p style="margin:8px 0 22px;font-size:14.5px;color:var(--text-secondary)">Straight from the execs. Pinned posts stay on top.</p>
+
+<sc-if value="{{ feedCards }}">
+<div style="display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ posts }}" as="p" hint-placeholder-count="3">
+<article style="background:var(--surface-card);border:1px solid {{ p.border }};border-radius:var(--radius-md);padding:15px">
+<div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
+<span style="width:30px;height:30px;flex:none;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--white)">{{ p.initials }}</span>
+<span style="flex:1;display:flex;flex-direction:column;gap:1px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:13.5px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">{{ p.author }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:10.5px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">{{ p.title }} · {{ p.ago }}</span>
+</span>
+<sc-if value="{{ p.pinned }}"><i class="ph-bold ph-push-pin" style="font-size:16px;color:var(--red-500)"></i></sc-if>
+</div>
+<p style="margin:0;font-size:14.5px;line-height:1.55;color:var(--gray-200);white-space:pre-wrap">{{ p.text }}</p>
+<sc-if value="{{ isExec }}">
+<div style="display:flex;gap:8px;margin-top:13px;padding-top:12px;border-top:1px solid var(--ink-800)">
+<button onClick="{{ p.pin }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:1px solid var(--ink-600);border-radius:var(--radius-sm);padding:8px 6px;cursor:pointer;color:var(--gray-300);font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-push-pin" style="font-size:13px"></i>{{ p.pinLabel }}</button>
+<button onClick="{{ p.edit }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:1px solid var(--ink-600);border-radius:var(--radius-sm);padding:8px 6px;cursor:pointer;color:var(--gray-300);font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-pencil-simple" style="font-size:13px"></i>Edit</button>
+<button onClick="{{ p.del }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:transparent;border:1px solid var(--red-800);border-radius:var(--radius-sm);padding:8px 6px;cursor:pointer;color:var(--red-500);font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-trash" style="font-size:13px"></i>Delete</button>
+</div>
+</sc-if>
+</article>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ feedBulletin }}">
+<div style="background:var(--white);border-radius:var(--radius-md);overflow:hidden">
+<div style="background:var(--black);padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--white)">Notice board</span>
+<i class="ph-bold ph-barbell" style="font-size:17px;color:var(--red-500)"></i>
+</div>
+<sc-for list="{{ posts }}" as="p" hint-placeholder-count="3">
+<div style="padding:16px;border-bottom:1px solid var(--gray-200)">
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+<sc-if value="{{ p.pinned }}"><span style="font-family:var(--font-heading);font-weight:700;font-size:10px;letter-spacing:var(--tracking-widest);text-transform:uppercase;background:var(--red-600);color:var(--white);padding:2px 8px;border-radius:var(--radius-pill)">Pinned</span></sc-if>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--red-700)">{{ p.author }} · {{ p.title }}</span>
+</div>
+<p style="margin:0 0 6px;font-family:var(--font-body);font-size:14.5px;line-height:1.5;color:var(--black);white-space:pre-wrap">{{ p.text }}</p>
+<span style="font-size:11.5px;color:var(--gray-500)">{{ p.ago }}</span>
+<sc-if value="{{ isExec }}">
+<div style="display:flex;gap:14px;margin-top:10px">
+<button onClick="{{ p.pin }}" style="background:none;border:none;padding:0;cursor:pointer;color:var(--red-700);font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase">{{ p.pinLabel }}</button>
+<button onClick="{{ p.edit }}" style="background:none;border:none;padding:0;cursor:pointer;color:var(--red-700);font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase">Edit</button>
+<button onClick="{{ p.del }}" style="background:none;border:none;padding:0;cursor:pointer;color:var(--red-700);font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase">Delete</button>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabSchedule }}">
+<div style="animation:wl-rise .28s var(--ease-standard)">
+<div style="font-family:var(--font-display);font-size:38px;line-height:1;text-transform:uppercase;color:var(--white)">Schedule</div>
+<p style="margin:8px 0 18px;font-size:14.5px;color:var(--text-secondary)">Meets, open lifts and guest speakers.</p>
+<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:16px">
+<sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+<span style="flex:none"><x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Tag" active="{{ f.active }}" onClick="{{ f.go }}" hint-size="auto,32px">{{ f.label }}</x-import></span>
+</sc-for>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{ events }}" as="e" hint-placeholder-count="4">
+<button onClick="{{ e.open }}" style="width:100%;text-align:left;display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:14px;cursor:pointer">
+<span style="display:flex;flex-direction:column;align-items:center;gap:1px;border-right:1px solid var(--ink-700);padding-right:12px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--red-500)">{{ e.mon }}</span>
+<span style="font-family:var(--font-display);font-size:28px;line-height:1;color:var(--white);font-variant-numeric:tabular-nums">{{ e.day }}</span>
+</span>
+<span style="display:flex;flex-direction:column;gap:5px;min-width:0">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:16.5px;line-height:1.15;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">{{ e.name }}</span>
+<span style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:12px;color:var(--gray-400)">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:10px;letter-spacing:var(--tracking-wider);text-transform:uppercase;background:var(--ink-700);color:var(--gray-200);padding:2px 7px;border-radius:var(--radius-sm)">{{ e.kind }}</span>
+<span>{{ e.time }}</span><span>{{ e.when }}</span>
+</span>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:{{ e.spotsColor }}">{{ e.spotsLabel }}</span>
+</span>
+<i class="ph-bold ph-caret-right" style="font-size:16px;color:var(--gray-500)"></i>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atEvent }}">
+<div style="animation:wl-rise .28s var(--ease-standard)">
+<button onClick="{{ closeSub }}" style="background:none;border:none;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Schedule</button>
+<div style="background:var(--red-600);border-radius:var(--radius-md);padding:20px;margin-bottom:16px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:rgba(255,255,255,.75)">{{ selKind }}</span>
+<div style="font-family:var(--font-display);font-size:34px;line-height:1.02;text-transform:uppercase;color:var(--white);margin-top:8px">{{ selName }}</div>
+</div>
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:4px 16px;margin-bottom:16px">
+<sc-for list="{{ selMeta }}" as="row" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--ink-800)">
+<i class="{{ row.icon }}" style="font-size:18px;color:var(--red-500);width:20px"></i>
+<span style="flex:1;font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">{{ row.label }}</span>
+<span style="font-size:14.5px;font-weight:500;color:var(--white)">{{ row.value }}</span>
+</div>
+</sc-for>
+</div>
+<p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:var(--text-secondary)">{{ selDesc }}</p>
+<div style="display:grid;margin-bottom:18px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" variant="{{ rsvpVariant }}" onClick="{{ toggleRsvp }}" hint-size="100%,54px">{{ rsvpLabel }}</x-import>
+</div>
+<sc-if value="{{ isExec }}">
+<div style="display:flex;gap:10px;margin-bottom:20px">
+<button onClick="{{ editSel }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:transparent;border:1px solid var(--ink-600);border-radius:var(--radius-sm);padding:12px 8px;cursor:pointer;color:var(--white);font-family:var(--font-heading);font-weight:700;font-size:13px;letter-spacing:var(--tracking-wide);text-transform:uppercase"><i class="ph-bold ph-pencil-simple" style="font-size:15px"></i>Edit event</button>
+<button onClick="{{ deleteSel }}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:7px;background:transparent;border:1px solid var(--red-800);border-radius:var(--radius-sm);padding:12px 8px;cursor:pointer;color:var(--red-500);font-family:var(--font-heading);font-weight:700;font-size:13px;letter-spacing:var(--tracking-wide);text-transform:uppercase"><i class="ph-bold ph-trash" style="font-size:15px"></i>Delete</button>
+</div>
+</sc-if>
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Going</span>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">{{ selGoingLabel }}</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:7px">
+<sc-for list="{{ selGoing }}" as="g" hint-placeholder-count="6">
+<span style="width:34px;height:34px;border-radius:50%;background:var(--ink-800);border:1px solid var(--ink-600);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--gray-200)">{{ g.initials }}</span>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabProfile }}">
+<div style="animation:wl-rise .28s var(--ease-standard)">
+<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:6px 0 24px">
+<label style="width:92px;height:92px;border-radius:50%;background:var(--ink-900);border:3px solid var(--red-600);box-shadow:0 0 0 3px var(--black),0 0 0 4px var(--ink-700);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:34px;color:var(--white);cursor:pointer;overflow:hidden;position:relative">
+<span style="position:relative;z-index:0">{{ initials }}</span>
+<span style="position:absolute;inset:0;z-index:1;background-size:cover;background-position:center;background-image:{{ avatarBg }}"></span>
+<input type="file" accept="image/*" onChange="{{ uploadAvatar }}" style="position:absolute;inset:0;z-index:2;opacity:0;cursor:pointer">
+</label>
+<span style="font-size:11px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--gray-500)">Tap photo to change</span>
+<div style="font-family:var(--font-display);font-size:30px;line-height:1;text-transform:uppercase;color:var(--white);text-align:center">{{ userName }}</div>
+<div style="display:flex;align-items:center;gap:8px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Badge" tone="{{ roleTone }}" hint-size="auto,24px">{{ roleLabel }}</x-import>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">{{ userGrade }}</span>
+</div>
+<span style="font-size:13.5px;color:var(--gray-400)">{{ userEmail }}</span>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:14px">
+<div style="font-family:var(--font-display);font-size:34px;line-height:1;color:var(--white)">{{ statSessions }}</div>
+<div style="font-family:var(--font-heading);font-weight:700;font-size:10.5px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500);margin-top:4px">Sessions this month</div>
+</div>
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:14px">
+<div style="font-family:var(--font-display);font-size:34px;line-height:1;color:var(--red-500)">{{ statRsvps }}</div>
+<div style="font-family:var(--font-heading);font-weight:700;font-size:10.5px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500);margin-top:4px">Events you’re in</div>
+</div>
+</div>
+
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:11px;margin-bottom:12px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Switch" label="Show my name in Who’s here" checked="{{ userVisible }}" onChange="{{ setUserVisible }}" hint-size="100%,22px"></x-import>
+<p style="margin:0;font-size:13px;line-height:1.5;color:var(--text-tertiary)">{{ visibleNote }}</p>
+</div>
+
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:4px 16px;margin-bottom:20px">
+<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--ink-800)">
+<i class="ph-bold ph-phone" style="font-size:18px;color:var(--red-500);width:20px"></i>
+<span style="flex:1;font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Emergency contact</span>
+<span style="font-size:14px;font-weight:500;color:var(--white)">{{ userEc }}</span>
+</div>
+<div style="display:flex;align-items:center;gap:12px;padding:13px 0">
+<i class="ph-bold ph-shield-check" style="font-size:18px;color:var(--red-500);width:20px"></i>
+<span style="flex:1;font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Waiver</span>
+<span style="font-size:14px;font-weight:500;color:var(--status-success)">Signed</span>
+</div>
+</div>
+
+<div style="display:grid">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" variant="secondary" size="lg" onClick="{{ signOut }}" hint-size="100%,54px">Log out</x-import>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabManage }}">
+<div style="animation:wl-rise .28s var(--ease-standard)">
+
+<sc-if value="{{ mgHome }}">
+<div>
+<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+<div style="font-family:var(--font-display);font-size:38px;line-height:1;text-transform:uppercase;color:var(--white)">Manage</div>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Badge" hint-size="auto,24px">Exec only</x-import>
+</div>
+
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
+<sc-for list="{{ mgTiles }}" as="t" hint-placeholder-count="4">
+<button onClick="{{ t.go }}" style="text-align:left;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:15px;cursor:pointer;display:flex;flex-direction:column;gap:10px;min-height:112px">
+<i class="{{ t.icon }}" style="font-size:22px;color:var(--red-500)"></i>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:14.5px;line-height:1.15;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">{{ t.label }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">{{ t.meta }}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Sign-ups by event</span>
+</div>
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:4px 16px">
+<sc-for list="{{ rsvpRows }}" as="r" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--ink-800)">
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</span>
+<span style="font-size:11.5px;color:var(--gray-500)">{{ r.date }}</span>
+</span>
+<span style="font-family:var(--font-display);font-size:22px;color:var(--white);font-variant-numeric:tabular-nums">{{ r.going }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">/ {{ r.spots }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mgCount }}">
+<div>
+<button onClick="{{ mgBack }}" style="background:none;border:none;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Manage</button>
+<div style="font-family:var(--font-display);font-size:32px;line-height:1;text-transform:uppercase;color:var(--white)">Check-in</div>
+<p style="margin:8px 0 18px;font-size:14.5px;color:var(--text-secondary)">Tap a lifter in when they walk into the room, out when they leave. The live count is whoever is checked in.</p>
+
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;margin-bottom:16px">
+<div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
+<div style="display:flex;align-items:baseline;gap:8px">
+<span style="font-family:var(--font-display);font-size:52px;line-height:.85;font-variant-numeric:tabular-nums;color:{{ zoneColor }}">{{ count }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:17px;color:var(--gray-500);white-space:nowrap">/ {{ cap }}</span>
+</div>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;padding:5px 12px;border-radius:var(--radius-pill);border:1px solid {{ zoneColor }};color:{{ zoneColor }}">{{ zoneLabel }}</span>
+</div>
+<div style="margin-top:12px;height:8px;background:var(--ink-700);border-radius:var(--radius-sm);overflow:hidden">
+<span style="display:block;height:100%;width:{{ fillPct }}%;background:{{ zoneColor }};transition:width .3s var(--ease-standard)"></span>
+</div>
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px">
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">{{ inRoomLine }}</span>
+<button onClick="{{ clearRoom }}" style="background:none;border:none;padding:0;cursor:pointer;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--red-500)">Clear room</button>
+</div>
+</div>
+
+<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:13px 14px;margin-bottom:20px">
+<span style="display:flex;flex-direction:column;gap:2px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:12.5px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">Drop-ins</span>
+<span style="font-size:12.5px;color:var(--gray-500)">No account — still counted</span>
+</span>
+<span style="display:flex;align-items:center;gap:8px">
+<button onClick="{{ decGuest }}" style="width:38px;height:38px;background:var(--ink-800);border:1px solid var(--ink-600);border-radius:var(--radius-sm);color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-minus" style="font-size:15px"></i></button>
+<span style="min-width:26px;text-align:center;font-family:var(--font-display);font-size:24px;color:var(--white);font-variant-numeric:tabular-nums">{{ guests }}</span>
+<button onClick="{{ incGuest }}" style="width:38px;height:38px;background:var(--ink-800);border:1px solid var(--ink-600);border-radius:var(--radius-sm);color:var(--white);cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ph-bold ph-plus" style="font-size:15px"></i></button>
+</span>
+</div>
+
+<span style="display:block;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500);margin-bottom:11px">Roster</span>
+<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:26px">
+<sc-for list="{{ roomList }}" as="m" hint-placeholder-count="6">
+<button onClick="{{ m.toggle }}" style="width:100%;text-align:left;display:grid;grid-template-columns:22px 32px 1fr auto;gap:12px;align-items:center;background:{{ m.bg }};border:1px solid {{ m.border }};border-radius:var(--radius-md);padding:11px 13px;cursor:pointer;transition:background .16s var(--ease-standard),border-color .16s var(--ease-standard)">
+<span style="width:22px;height:22px;border:2px solid {{ m.boxBorder }};border-radius:var(--radius-sm);background:{{ m.boxBg }};display:flex;align-items:center;justify-content:center;color:var(--white)"><sc-if value="{{ m.in }}"><i class="ph-bold ph-check" style="font-size:12px"></i></sc-if></span>
+<span style="width:32px;height:32px;border-radius:50%;background:var(--ink-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:11.5px;color:var(--gray-200)">{{ m.initials }}</span>
+<span style="display:flex;flex-direction:column;gap:1px;min-width:0">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.name }}</span>
+<span style="font-size:11.5px;color:var(--gray-500)">{{ m.grade }}</span>
+</span>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:{{ m.stateColor }}">{{ m.stateLabel }}</span>
+</button>
+</sc-for>
+</div>
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:14px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Room capacity</span>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Max lifters" type="number" value="{{ capDraft }}" onChange="{{ setCapDraft }}" helper="Sets the ceiling the gauge fills against." hint-size="100%,92px"></x-import>
+<div style="display:grid">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" variant="secondary" onClick="{{ saveCap }}" hint-size="100%,46px">Save capacity</x-import>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mgPost }}">
+<div>
+<button onClick="{{ mgBack }}" style="background:none;border:none;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Manage</button>
+<div style="font-family:var(--font-display);font-size:32px;line-height:1;text-transform:uppercase;color:var(--white)">{{ postHeading }}</div>
+<p style="margin:8px 0 22px;font-size:14.5px;color:var(--text-secondary)">{{ postSub }}</p>
+<textarea rows="5" placeholder="Squat rack #2 is back in service." value="{{ postText }}" onChange="{{ setPostText }}" style="width:100%;background:var(--ink-800);color:var(--white);border:1px solid var(--ink-600);border-radius:var(--radius-sm);padding:13px 14px;font-size:16px;font-family:var(--font-body);line-height:1.5;outline:none;resize:vertical"></textarea>
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:14px;margin:14px 0 18px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Switch" label="Pin to the top" checked="{{ postPin }}" onChange="{{ setPostPin }}" hint-size="100%,22px"></x-import>
+<sc-if value="{{ newPost }}">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Switch" label="Send a push notification" checked="{{ postPush }}" onChange="{{ setPostPush }}" hint-size="100%,22px"></x-import>
+</sc-if>
+</div>
+<div style="display:grid">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" onClick="{{ savePost }}" hint-size="100%,54px">{{ postCta }}</x-import>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mgEvent }}">
+<div>
+<button onClick="{{ mgBack }}" style="background:none;border:none;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Manage</button>
+<div style="font-family:var(--font-display);font-size:32px;line-height:1;text-transform:uppercase;color:var(--white)">{{ evHeading }}</div>
+<p style="margin:8px 0 22px;font-size:14.5px;color:var(--text-secondary)">{{ evSub }}</p>
+<div style="display:grid;gap:16px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Name" placeholder="Fall Deadlift Meet" value="{{ evName }}" onChange="{{ setEvName }}" hint-size="100%,72px"></x-import>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Date" type="date" value="{{ evDate }}" onChange="{{ setEvDate }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Time" type="time" value="{{ evTime }}" onChange="{{ setEvTime }}" hint-size="100%,72px"></x-import>
+</div>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Select" label="Type" options="{{ kinds }}" value="{{ evKind }}" onChange="{{ setEvKind }}" hint-size="100%,72px"></x-import>
+<div style="display:grid;grid-template-columns:1fr 96px;gap:12px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Where" placeholder="Weight Room" value="{{ evLoc }}" onChange="{{ setEvLoc }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Spots" type="number" value="{{ evSpots }}" onChange="{{ setEvSpots }}" hint-size="100%,72px"></x-import>
+</div>
+<label style="display:flex;flex-direction:column;gap:6px">
+<span style="font-family:var(--font-heading);font-size:13px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--text-secondary);font-weight:600">Details</span>
+<textarea rows="3" placeholder="Weigh-in at 15:00. Sleeves or wraps allowed." value="{{ evDesc }}" onChange="{{ setEvDesc }}" style="width:100%;background:var(--ink-800);color:var(--white);border:1px solid var(--ink-600);border-radius:var(--radius-sm);padding:12px 14px;font-size:16px;font-family:var(--font-body);line-height:1.5;outline:none;resize:vertical"></textarea>
+</label>
+<sc-if value="{{ hasErr }}"><p style="margin:0;font-size:14px;color:var(--status-danger)">{{ err }}</p></sc-if>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" onClick="{{ saveEvent }}" hint-size="100%,54px">{{ evCta }}</x-import>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ mgMembers }}">
+<div>
+<button onClick="{{ mgBack }}" style="background:none;border:none;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Manage</button>
+<div style="font-family:var(--font-display);font-size:32px;line-height:1;text-transform:uppercase;color:var(--white)">Members</div>
+<p style="margin:8px 0 20px;font-size:14.5px;color:var(--text-secondary)">{{ memberCountLine }}</p>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ members }}" as="m" hint-placeholder-count="6">
+<div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:12px 14px">
+<span style="width:34px;height:34px;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--white)">{{ m.initials }}</span>
+<span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">{{ m.name }}</span>
+<span style="font-size:12px;color:var(--gray-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.email }}</span>
+</span>
+<span style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-400)">{{ m.grade }}</span>
+<span style="display:flex;align-items:center;gap:4px;font-family:var(--font-heading);font-weight:600;font-size:10px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:{{ m.visColor }}"><i class="{{ m.visIcon }}" style="font-size:12px"></i>{{ m.visLabel }}</span>
+</span>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+</div>
+</sc-if>
+
+</div>
+
+<div style="flex:none;display:flex;border-top:1px solid var(--ink-700);background:var(--black)">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
+<button onClick="{{ t.go }}" style="flex:1;position:relative;background:none;border:none;padding:11px 0 calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ t.color }}">
+<sc-if value="{{ t.active }}"><span style="position:absolute;top:0;width:30px;height:3px;background:var(--red-600)"></span></sc-if>
+<i class="{{ t.icon }}" style="font-size:22px"></i>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:10px;letter-spacing:var(--tracking-wider);text-transform:uppercase">{{ t.label }}</span>
+<sc-if value="{{ t.dot }}"><span style="position:absolute;top:9px;margin-left:17px;width:7px;height:7px;border-radius:50%;background:var(--red-500)"></span></sc-if>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasPush }}">
+<div style="position:absolute;top:calc(env(safe-area-inset-top) + 12px);left:12px;right:12px;z-index:80;background:rgba(27,27,27,.96);border:1px solid var(--ink-600);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:13px 15px;display:flex;gap:11px;align-items:flex-start;animation:wl-drop .3s var(--ease-standard)">
+<img src="assets/wlmac-crest-t.png" alt="" style="width:34px;height:34px;object-fit:contain;flex:none">
+<span style="display:flex;flex-direction:column;gap:3px;min-width:0">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--white)">WLMAC Fitness Club</span>
+<span style="font-size:13.5px;line-height:1.4;color:var(--gray-200)">{{ push }}</span>
+</span>
+</div>
+</sc-if>
+
+<sc-if value="{{ hasToast }}">
+<div style="position:absolute;left:16px;right:16px;bottom:104px;z-index:70;background:var(--ink-800);border:1px solid var(--ink-600);border-left:3px solid var(--red-600);border-radius:var(--radius-sm);padding:12px 14px;font-size:14px;color:var(--white);box-shadow:var(--shadow-md);animation:wl-rise .26s var(--ease-standard)">{{ toast }}</div>
+</sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;gaugeStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Plate rack&quot;,&quot;Capacity bar&quot;,&quot;Crest ring&quot;],&quot;default&quot;:&quot;Plate rack&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variations&quot;},&quot;feedStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Cards&quot;,&quot;Bulletin&quot;],&quot;default&quot;:&quot;Cards&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Variations&quot;},&quot;showWhosHere&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Variations&quot;},&quot;roomCapacity&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:20,&quot;min&quot;:10,&quot;max&quot;:60,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Club setup&quot;},&quot;startSignedInAs&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Nobody&quot;,&quot;Member&quot;,&quot;Exec&quot;],&quot;default&quot;:&quot;Nobody&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Club setup&quot;}}">
+class Component extends DCLogic {
+  // Paste your Supabase project's values here before deploying (Project Settings -> API).
+  // Leave blank to fall back to local demo data with no backend.
+  SUPABASE_URL = 'https://olztucmomssaimcpcjxd.supabase.co';
+  SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9senR1Y21vbXNzYWltY3BjanhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzODExNzgsImV4cCI6MjEwMDk1NzE3OH0.DPRgSg-clJFPy3R5aZmVBhBHCq0SBa3lwIpnXbHEmZM';
+
+  state = {
+    route: 'welcome', step: 1, tab: 'home', sub: null, selId: null,
+    email: '', pass: '', err: '',
+    suName: '', suEmail: '', suGrade: 'Grade 9', suPass: '', suEcName: '', suEcPhone: '',
+    suWaiver: false, suCoc: false, suVisible: true,
+    user: null,
+    roster: null, checkins: {}, guests: 2, capacity: null, updatedAt: Date.now(),
+    filter: 'All', rsvps: [],
+    toast: null, push: null,
+    capDraft: null, editPostId: null, editEventId: null,
+    evName: '', evDate: '', evTime: '', evKind: 'Powerlifting', evLoc: 'Weight Room', evSpots: '20', evDesc: '',
+    postText: '', postPin: false, postPush: true,
+    events: null, posts: null, tick: 0,
+    sbUrlDraft: '', sbKeyDraft: '',
+  };
+
+  mockAccounts() {
+    return [
+      { id: 'priya@wlmac.ca', email: 'priya@wlmac.ca', pass: 'lift2027', name: 'Priya Raman', grade: 'Grade 12', role: 'exec', title: 'President', ec_name: 'A. Raman', ec_phone: '416 555 0119', visible: true },
+      { id: 'devon@wlmac.ca', email: 'devon@wlmac.ca', pass: 'lift2027', name: 'Devon Achebe', grade: 'Grade 11', role: 'exec', title: 'Meet Director', ec_name: 'N. Achebe', ec_phone: '647 555 0182', visible: true },
+      { id: 'sam@wlmac.ca', email: 'sam@wlmac.ca', pass: 'squat123', name: 'Sam Okafor', grade: 'Grade 10', role: 'member', title: 'Member', ec_name: 'J. Okafor', ec_phone: '416 555 0134', visible: true }
+    ];
+  }
+
+  mockRoster() {
+    return [
+      { id: 'sam@wlmac.ca', name: 'Sam Okafor', grade: 'Grade 10', email: 'sam@wlmac.ca', role: 'member', visible: true, here: true },
+      { id: 'priya@wlmac.ca', name: 'Priya Raman', grade: 'Grade 12', email: 'priya@wlmac.ca', role: 'exec', visible: true, here: true },
+      { id: 'devon@wlmac.ca', name: 'Devon Achebe', grade: 'Grade 11', email: 'devon@wlmac.ca', role: 'exec', visible: true, here: false },
+      { id: 'mia@wlmac.ca', name: 'Mia Kowalczyk', grade: 'Grade 11', email: 'mia@wlmac.ca', role: 'member', visible: true, here: true },
+      { id: 'theo@wlmac.ca', name: 'Theo Nguyen', grade: 'Grade 9', email: 'theo@wlmac.ca', role: 'member', visible: false, here: true },
+      { id: 'ife@wlmac.ca', name: 'Ife Balogun', grade: 'Grade 12', email: 'ife@wlmac.ca', role: 'member', visible: true, here: true },
+      { id: 'jonah@wlmac.ca', name: 'Jonah Reyes', grade: 'Grade 10', email: 'jonah@wlmac.ca', role: 'member', visible: false, here: true },
+      { id: 'amara@wlmac.ca', name: 'Amara Singh', grade: 'Grade 9', email: 'amara@wlmac.ca', role: 'member', visible: true, here: false },
+      { id: 'lena@wlmac.ca', name: 'Lena Voss', grade: 'Grade 12', email: 'lena@wlmac.ca', role: 'member', visible: false, here: false },
+      { id: 'cody@wlmac.ca', name: 'Cody Tran', grade: 'Grade 11', email: 'cody@wlmac.ca', role: 'member', visible: true, here: false }
+    ];
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(() => this.setState(s => ({ tick: s.tick + 1 })), 30000);
+    const url = this.SUPABASE_URL || localStorage.getItem('wlmac.sbUrl');
+    const key = this.SUPABASE_ANON_KEY || localStorage.getItem('wlmac.sbKey');
+    if (url && key) this.waitForSupabaseLib(0, url, key);
+    else this.loadMock();
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+    if (this.tt) clearTimeout(this.tt);
+    if (this.pt) clearTimeout(this.pt);
+    if (this.sb && this.sbChannel) this.sb.removeChannel(this.sbChannel);
+  }
+
+  waitForSupabaseLib(tries, url, key) {
+    if (window.supabase && window.supabase.createClient) return this.initSupabase(url, key);
+    if (tries > 50) { this.say('Could not load the Supabase library.'); return this.loadMock(); }
+    setTimeout(() => this.waitForSupabaseLib(tries + 1, url, key), 100);
+  }
+
+  async initSupabase(url, key) {
+    try { this.sb = window.supabase.createClient(url, key); }
+    catch (e) { this.say('Could not connect — check the URL and key.'); return this.loadMock(); }
+    this.forceUpdate();
+    await Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom()]);
+    const { data } = await this.sb.auth.getSession();
+    if (data && data.session) await this.loadSessionUser(data.session.user.id);
+    this.sb.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_OUT') this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, rsvps: [] });
+    });
+    this.sbChannel = this.sb.channel('wlmac-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'checkins' }, () => this.loadCheckins())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'room_state' }, () => this.loadRoom())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => this.loadEvents())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => this.loadPosts())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => this.loadRoster())
+      .subscribe();
+  }
+
+  loadMock() {
+    const roster = this.mockRoster();
+    const checkins = {};
+    roster.forEach(m => { checkins[m.id] = !!m.here; });
+    this.setState({ roster: roster, checkins: checkins, guests: 2, events: this.seedEvents(), posts: this.seedPosts() });
+    const start = this.props.startSignedInAs;
+    if (start === 'Member') this.setState({ user: this.mockAccounts()[2], route: 'app' });
+    if (start === 'Exec') this.setState({ user: this.mockAccounts()[0], route: 'app' });
+  }
+
+  connectSb = () => {
+    const url = this.state.sbUrlDraft.trim(), key = this.state.sbKeyDraft.trim();
+    if (!url || !key) return this.say('Paste both the project URL and the anon key.');
+    localStorage.setItem('wlmac.sbUrl', url);
+    localStorage.setItem('wlmac.sbKey', key);
+    location.reload();
+  };
+  disconnectSb = () => {
+    localStorage.removeItem('wlmac.sbUrl');
+    localStorage.removeItem('wlmac.sbKey');
+    location.reload();
+  };
+
+  async loadRoster() {
+    const { data, error } = await this.sb.from('profiles').select('*').order('name');
+    if (!error) this.setState({ roster: data });
+  }
+  async loadEvents() {
+    const { data, error } = await this.sb.from('events').select('*').order('event_date').order('event_time');
+    if (!error) this.setState({ events: data.map(e => ({ id: e.id, name: e.name, kind: e.kind, date: e.event_date, time: (e.event_time || '').slice(0, 5), loc: e.loc, spots: e.spots, going: e.going, desc: e.details || '' })) });
+  }
+  async loadPosts() {
+    const { data, error } = await this.sb.from('posts').select('*').order('pinned', { ascending: false }).order('created_at', { ascending: false });
+    if (!error) this.setState({ posts: data.map(p => ({ id: p.id, pinned: p.pinned, author: p.author_name, title: p.author_title, at: new Date(p.created_at).getTime(), text: p.text, edited: p.edited })) });
+  }
+  async loadCheckins() {
+    const { data, error } = await this.sb.from('checkins').select('*');
+    if (!error) { const map = {}; data.forEach(c => { map[c.profile_id] = c.checked_in; }); this.setState({ checkins: map, updatedAt: Date.now() }); }
+  }
+  async loadRoom() {
+    const { data, error } = await this.sb.from('room_state').select('*').eq('id', 1).single();
+    if (!error && data) this.setState({ guests: data.guests, capacity: data.capacity, updatedAt: Date.now() });
+  }
+  async loadMyRsvps(profileId) {
+    const { data, error } = await this.sb.from('rsvps').select('event_id').eq('profile_id', profileId);
+    if (!error) this.setState({ rsvps: data.map(r => r.event_id) });
+  }
+  uploadAvatar = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file || !this.sb || !this.state.user) return;
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+    const path = this.state.user.id + '/avatar.' + ext;
+    const { error: upErr } = await this.sb.storage.from('avatars').upload(path, file, { upsert: true, contentType: file.type });
+    if (upErr) return this.say(upErr.message);
+    const { data } = this.sb.storage.from('avatars').getPublicUrl(path);
+    const url = data.publicUrl + '?t=' + Date.now();
+    await this.sb.from('profiles').update({ avatar_url: url }).eq('id', this.state.user.id);
+    this.setState(s => ({ user: { ...s.user, avatar_url: url } }));
+    this.say('Profile photo updated.');
+  };
+  async loadSessionUser(id) {
+    const { data, error } = await this.sb.from('profiles').select('*').eq('id', id).single();
+    if (!error && data) { this.setState({ user: data, route: 'app', tab: 'home' }); this.loadMyRsvps(id); return; }
+    // No profile row yet (e.g. account created before the row-creation trigger ran, or trigger
+    // missed it) — recover the name/email from the auth session and create the row ourselves.
+    const { data: au } = await this.sb.auth.getUser();
+    const meta = (au && au.user && au.user.user_metadata) || {};
+    const email = (au && au.user && au.user.email) || '';
+    const fallbackUser = { id, email, name: meta.name || email.split('@')[0] || 'Member', grade: meta.grade || '', role: 'member', title: 'Member', ec_name: meta.ec_name || '', ec_phone: meta.ec_phone || '', visible: meta.visible !== false, waiver_signed: true };
+    await this.sb.from('profiles').upsert(fallbackUser);
+    this.setState({ route: 'app', tab: 'home', user: fallbackUser });
+    this.loadMyRsvps(id);
+  }
+
+  iso(days) { const d = new Date(); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); }
+
+  seedEvents() {
+    return [
+      { id: 1, name: 'Open Lift Thursday', kind: 'Open Lift', date: this.iso(2), time: '14:45', loc: 'Weight Room', spots: 20, going: 11, desc: 'Racks free for anyone. Spotters on hand, no sign-up needed if there is room. Bring your own straps if you have them — we have the rest.' },
+      { id: 2, name: 'Fall Deadlift Meet', kind: 'Powerlifting', date: this.iso(6), time: '15:30', loc: 'Weight Room', spots: 24, going: 19, desc: 'Weigh-in at 15:00. Three attempts each, sleeves or wraps allowed. New PRs get announced. Bring a spotter.' },
+      { id: 3, name: 'Pull-Up Ladder', kind: 'Calisthenics', date: this.iso(13), time: '16:00', loc: 'Small Gym', spots: 16, going: 16, desc: 'Bracket format, strict form only — no kipping. Bodyweight classes so it stays fair.' },
+      { id: 4, name: 'Guest Speaker: Provincial Champ', kind: 'Guest Speaker', date: this.iso(20), time: '15:15', loc: 'Room 214', spots: 40, going: 12, desc: 'Ontario 83kg record holder on programming a school-year training block. Q&A after.' }
+    ];
+  }
+
+  seedPosts() {
+    const h = 3600000;
+    return [
+      { id: 1, pinned: true, author: 'Priya Raman', title: 'President', at: Date.now() - h * 5, text: 'Squat rack #2 is back in service. New J-hooks, so check your height setting before you load up.' },
+      { id: 2, pinned: false, author: 'Devon Achebe', title: 'Meet Director', at: Date.now() - h * 30, text: 'Sign-ups for the Fall Deadlift Meet close Thursday. 19 of 24 spots gone. See a captain to get on the roster.' },
+      { id: 3, pinned: false, author: 'Priya Raman', title: 'President', at: Date.now() - h * 74, text: 'Chalk is restocked. Wipe the bar down when you rack it — Mr. Delgado will pull our room privileges otherwise.' }
+    ];
+  }
+
+  ago(ts) {
+    const m = Math.floor((Date.now() - ts) / 60000);
+    if (m < 1) return 'just now';
+    if (m < 60) return m + 'm ago';
+    const h = Math.floor(m / 60);
+    if (h < 24) return h + 'h ago';
+    const d = Math.floor(h / 24);
+    if (d < 7) return d + 'd ago';
+    return new Date(ts).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+
+  when(dateStr) {
+    const t = new Date(dateStr + 'T00:00:00'), n = new Date(); n.setHours(0, 0, 0, 0);
+    const d = Math.round((t - n) / 86400000);
+    if (d < 0) return 'Done';
+    if (d === 0) return 'Today';
+    if (d === 1) return 'Tomorrow';
+    if (d < 7) return 'In ' + d + ' days';
+    const w = Math.round(d / 7);
+    return 'In ' + w + (w === 1 ? ' week' : ' weeks');
+  }
+
+  t12(t) {
+    if (!t) return '';
+    const p = t.split(':'), h = Number(p[0]);
+    const ap = h >= 12 ? 'PM' : 'AM', hr = h % 12 === 0 ? 12 : h % 12;
+    return hr + ':' + p[1] + ' ' + ap;
+  }
+
+  inits(n) { return String(n || '').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase(); }
+  first(n) { return String(n || '').split(' ')[0]; }
+
+  cap() { return Math.max(1, this.state.capacity != null ? this.state.capacity : (this.props.roomCapacity || 20)); }
+
+  headCount() {
+    const checkins = this.state.checkins || {};
+    const inCount = Object.keys(checkins).filter(id => checkins[id]).length;
+    return inCount + Math.max(0, Number(this.state.guests) || 0);
+  }
+
+  zone() {
+    const pct = Math.min(100, (this.headCount() / this.cap()) * 100);
+    if (pct < 25) return { label: 'Quiet', color: 'var(--green-600)', note: 'Racks are wide open. Good time for heavy singles.' };
+    if (pct < 55) return { label: 'Steady', color: 'var(--white)', note: 'Normal afternoon. You will get a bench.' };
+    if (pct < 85) return { label: 'Busy', color: 'var(--amber-600)', note: 'Expect to share a rack. Work in with someone.' };
+    return { label: 'Packed', color: 'var(--red-500)', note: 'Room is at capacity. Come back after 4.' };
+  }
+
+  say(msg) { this.setState({ toast: msg }); if (this.tt) clearTimeout(this.tt); this.tt = setTimeout(() => this.setState({ toast: null }), 2600); }
+  ping(msg) { this.setState({ push: msg }); if (this.pt) clearTimeout(this.pt); this.pt = setTimeout(() => this.setState({ push: null }), 4200); }
+
+  go(tab) { this.setState({ tab: tab, sub: null, err: '' }); }
+
+  doLogin = async () => {
+    if (this.sb) {
+      this.setState({ err: '' });
+      const { data, error } = await this.sb.auth.signInWithPassword({ email: this.state.email.trim().toLowerCase(), password: this.state.pass });
+      if (error) return this.setState({ err: error.message });
+      await this.loadSessionUser(data.user.id);
+      this.setState({ pass: '' });
+      this.say('Logged in as ' + this.first((this.state.user || {}).name));
+      return;
+    }
+    const a = this.mockAccounts().filter(x => x.email === this.state.email.trim().toLowerCase() && x.pass === this.state.pass)[0];
+    if (!a) return this.setState({ err: 'That email and password do not match. Check the demo logins below.' });
+    this.setState({ user: a, route: 'app', tab: 'home', err: '', pass: '' });
+    this.say('Logged in as ' + this.first(a.name));
+  };
+
+  signupNext = async () => {
+    const s = this.state;
+    if (s.step === 1) {
+      if (!s.suName.trim()) return this.setState({ err: 'We need your name.' });
+      if (!/.+@.+\..+/.test(s.suEmail)) return this.setState({ err: 'Use your school email.' });
+      return this.setState({ step: 2, err: '' });
+    }
+    if (s.step === 2) {
+      if (s.suPass.length < 8) return this.setState({ err: 'Password needs 8 characters or more.' });
+      if (!s.suEcName.trim() || !s.suEcPhone.trim()) return this.setState({ err: 'Emergency contact is required to train in the room.' });
+      return this.setState({ step: 3, err: '' });
+    }
+    if (this.sb) {
+      this.setState({ err: '' });
+      const { data, error } = await this.sb.auth.signUp({
+        email: s.suEmail.trim().toLowerCase(), password: s.suPass,
+        options: { data: { name: s.suName.trim(), grade: s.suGrade, ec_name: s.suEcName.trim(), ec_phone: s.suEcPhone.trim(), visible: s.suVisible } }
+      });
+      if (error) return this.setState({ err: error.message });
+      if (data.session) {
+        await this.loadSessionUser(data.user.id);
+        this.say('You are in. Welcome to the club.');
+      } else {
+        this.setState({ route: 'login', err: '', email: s.suEmail.trim().toLowerCase() });
+        this.say('Check your email to confirm your account, then log in.');
+      }
+      return;
+    }
+    const u = { id: s.suEmail.trim().toLowerCase(), email: s.suEmail.trim().toLowerCase(), name: s.suName.trim(), grade: s.suGrade, role: 'member', title: 'Member', ec_name: s.suEcName.trim(), ec_phone: s.suEcPhone.trim(), visible: s.suVisible };
+    this.setState({ user: u, route: 'app', tab: 'home', err: '' });
+    this.say('You are in. Welcome to the club.');
+  };
+
+  toggleHere = async (id, name) => {
+    const cur = !!this.state.checkins[id];
+    if (this.sb) {
+      const { error } = await this.sb.from('checkins').update({ checked_in: !cur, updated_at: new Date().toISOString() }).eq('profile_id', id);
+      if (error) return this.say('Could not update — try again.');
+      this.say(this.first(name) + (cur ? ' checked out' : ' checked in'));
+      return;
+    }
+    this.setState(s => ({ checkins: Object.assign({}, s.checkins, { [id]: !cur }), updatedAt: Date.now() }));
+    this.say(this.first(name) + (cur ? ' checked out' : ' checked in'));
+  };
+
+  bumpGuests = async (d) => {
+    const next = Math.max(0, (Number(this.state.guests) || 0) + d);
+    if (this.sb) {
+      const { error } = await this.sb.from('room_state').update({ guests: next, updated_at: new Date().toISOString() }).eq('id', 1);
+      if (error) return this.say('Could not update.');
+      return;
+    }
+    this.setState({ guests: next, updatedAt: Date.now() });
+  };
+
+  clearRoom = async () => {
+    if (this.sb) {
+      await this.sb.from('checkins').update({ checked_in: false, updated_at: new Date().toISOString() }).not('profile_id', 'is', null);
+      await this.sb.from('room_state').update({ guests: 0, updated_at: new Date().toISOString() }).eq('id', 1);
+      this.say('Room cleared — count is 0');
+      return;
+    }
+    this.setState({ checkins: {}, guests: 0, updatedAt: Date.now() });
+    this.say('Room cleared — count is 0');
+  };
+
+  saveCap = async () => {
+    const n = Math.round(Number(this.state.capDraft));
+    if (!isFinite(n) || n < 1) return this.say('Capacity needs to be at least 1');
+    if (this.sb) {
+      const { error } = await this.sb.from('room_state').update({ capacity: n, updated_at: new Date().toISOString() }).eq('id', 1);
+      if (error) return this.say('Could not save capacity.');
+      return this.say('Capacity set to ' + n);
+    }
+    this.setState({ capacity: n, updatedAt: Date.now() });
+    this.say('Capacity set to ' + n);
+  };
+
+  savePost = async () => {
+    const txt = this.state.postText.trim();
+    if (!txt) return this.say('Write something first');
+    const u = this.state.user || {}, editing = this.state.editPostId;
+    if (this.sb) {
+      if (editing) {
+        const { error } = await this.sb.from('posts').update({ text: txt, pinned: this.state.postPin, edited: true }).eq('id', editing);
+        if (error) return this.say('Could not save changes.');
+        this.setState({ postText: '', postPin: false, editPostId: null, tab: 'board', sub: null });
+        return this.say('Post updated');
+      }
+      const { error } = await this.sb.from('posts').insert({ author_name: u.name, author_title: u.title, text: txt, pinned: this.state.postPin });
+      if (error) return this.say('Could not post.');
+      const push = this.state.postPush;
+      this.setState({ postText: '', postPin: false, tab: 'board', sub: null });
+      this.say('Posted to the board');
+      if (push) this.ping(txt.length > 90 ? txt.slice(0, 90) + '…' : txt);
+      return;
+    }
+    if (editing) {
+      this.setState(s => ({
+        posts: (s.posts || []).map(p => p.id === editing ? Object.assign({}, p, { text: txt, pinned: s.postPin, edited: true }) : p),
+        postText: '', postPin: false, editPostId: null, tab: 'board', sub: null
+      }));
+      return this.say('Post updated');
+    }
+    const p = { id: Date.now(), pinned: this.state.postPin, author: u.name, title: u.title, at: Date.now(), text: txt };
+    this.setState(s => ({ posts: [p].concat(s.posts || []), postText: '', postPin: false, tab: 'board', sub: null }));
+    this.say('Posted to the board');
+    if (this.state.postPush) this.ping(txt.length > 90 ? txt.slice(0, 90) + '…' : txt);
+  };
+
+  editPost = (p) => this.setState({ tab: 'manage', sub: 'post', editPostId: p.id, postText: p.text, postPin: p.pinned, postPush: false });
+
+  deletePost = async (id) => {
+    if (this.sb) {
+      const { error } = await this.sb.from('posts').delete().eq('id', id);
+      if (error) return this.say('Could not delete.');
+      return this.say('Post deleted');
+    }
+    this.setState(s => ({ posts: (s.posts || []).filter(p => p.id !== id) }));
+    this.say('Post deleted');
+  };
+
+  togglePin = async (id) => {
+    if (this.sb) {
+      const cur = (this.state.posts || []).filter(p => p.id === id)[0];
+      const { error } = await this.sb.from('posts').update({ pinned: !(cur && cur.pinned) }).eq('id', id);
+      if (error) this.say('Could not update.');
+      return;
+    }
+    this.setState(s => ({ posts: (s.posts || []).map(p => p.id === id ? Object.assign({}, p, { pinned: !p.pinned }) : p) }));
+  };
+
+  editEvent = (e) => this.setState({
+    tab: 'manage', sub: 'newEvent', editEventId: e.id, err: '',
+    evName: e.name, evDate: e.date, evTime: e.time, evKind: e.kind, evLoc: e.loc, evSpots: String(e.spots), evDesc: e.desc || ''
+  });
+
+  deleteEvent = async (id) => {
+    if (this.sb) {
+      const { error } = await this.sb.from('events').delete().eq('id', id);
+      if (error) return this.say('Could not delete event.');
+      this.setState(s => ({ sub: null, tab: 'schedule', rsvps: s.rsvps.filter(x => x !== id) }));
+      return this.say('Event removed from the schedule');
+    }
+    this.setState(s => ({ events: (s.events || []).filter(e => e.id !== id), sub: null, tab: 'schedule', rsvps: s.rsvps.filter(x => x !== id) }));
+    this.say('Event removed from the schedule');
+  };
+
+  saveEvent = async () => {
+    const s = this.state;
+    if (!s.evName.trim()) return this.setState({ err: 'Give the event a name.' });
+    if (!s.evDate) return this.setState({ err: 'Pick a date.' });
+    const patch = { name: s.evName.trim(), kind: s.evKind, date: s.evDate, time: s.evTime || '15:00', loc: s.evLoc.trim() || 'Weight Room', spots: Math.max(1, Number(s.evSpots) || 20), desc: s.evDesc.trim() };
+    if (this.sb) {
+      const dbPatch = { name: patch.name, kind: patch.kind, event_date: patch.date, event_time: patch.time, loc: patch.loc, spots: patch.spots, details: patch.desc };
+      if (s.editEventId) {
+        const id = s.editEventId;
+        const { error } = await this.sb.from('events').update(dbPatch).eq('id', id);
+        if (error) return this.setState({ err: error.message });
+        this.setState({ editEventId: null, err: '', tab: 'schedule', sub: 'event', selId: id });
+        return this.say('Event updated');
+      }
+      const { error } = await this.sb.from('events').insert(dbPatch);
+      if (error) return this.setState({ err: error.message });
+      this.setState({ evName: '', evDate: '', evTime: '', evDesc: '', err: '', tab: 'schedule', sub: null });
+      return this.say('Event published');
+    }
+    if (s.editEventId) {
+      const id = s.editEventId;
+      this.setState(s2 => ({ events: (s2.events || []).map(e => e.id === id ? Object.assign({}, e, patch) : e), editEventId: null, err: '', tab: 'schedule', sub: 'event', selId: id }));
+      return this.say('Event updated');
+    }
+    const e = Object.assign({ id: Date.now(), going: 0 }, patch);
+    this.setState(s2 => ({ events: (s2.events || []).concat([e]), evName: '', evDate: '', evTime: '', evDesc: '', err: '', tab: 'schedule', sub: null }));
+    this.say('Event published');
+  };
+
+  toggleRsvp = async () => {
+    const id = this.state.selId;
+    const on = this.state.rsvps.indexOf(id) > -1;
+    if (this.sb) {
+      const uid = (this.state.user || {}).id;
+      if (on) { const { error } = await this.sb.from('rsvps').delete().eq('event_id', id).eq('profile_id', uid); if (error) return this.say('Could not update.'); }
+      else { const { error } = await this.sb.from('rsvps').insert({ event_id: id, profile_id: uid }); if (error) return this.say('Could not update.'); }
+      this.setState(s => ({ rsvps: on ? s.rsvps.filter(x => x !== id) : s.rsvps.concat([id]) }));
+      this.say(on ? 'Spot released' : 'You are on the roster');
+      return;
+    }
+    this.setState(s => ({
+      rsvps: on ? s.rsvps.filter(x => x !== id) : s.rsvps.concat([id]),
+      events: (s.events || []).map(e => e.id === id ? Object.assign({}, e, { going: Math.max(0, e.going + (on ? -1 : 1)) }) : e)
+    }));
+    this.say(on ? 'Spot released' : 'You are on the roster');
+  };
+
+  setUserVisible = (v) => {
+    this.setState(st => ({ user: Object.assign({}, st.user, { visible: v }) }));
+    if (this.sb && this.state.user) this.sb.from('profiles').update({ visible: v }).eq('id', this.state.user.id).then(({ error }) => { if (error) this.say('Could not save.'); });
+  };
+
+  signOut = () => {
+    if (this.sb) this.sb.auth.signOut();
+    this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, email: '', pass: '', rsvps: [] });
+  };
+
+  renderVals() {
+    const s = this.state, P = this.props;
+    const roster = s.roster || [];
+    const events = s.events || [];
+    const posts = s.posts || [];
+    const cap = this.cap();
+    const z = this.zone();
+    const head = this.headCount();
+    const pct = Math.min(100, (head / cap) * 100);
+    const u = s.user || {};
+    const isExec = u.role === 'exec';
+    const gauge = P.gaugeStyle || 'Plate rack';
+    const feed = P.feedStyle || 'Cards';
+    const wantPresent = P.showWhosHere !== false;
+
+    const segs = 20;
+    const lit = Math.round((pct / 100) * segs);
+    const plates = [];
+    for (let i = 0; i < segs; i++) plates.push({ h: i < lit ? '100%' : '62%', bg: i < lit ? z.color : 'var(--ink-700)' });
+
+    const sorted = events.slice().sort((a, b) => new Date(a.date + 'T' + a.time) - new Date(b.date + 'T' + b.time));
+    const nx = sorted[0] || {};
+    const fEvents = sorted.filter(e => s.filter === 'All' || e.kind === s.filter).map(e => {
+      const d = new Date(e.date + 'T00:00:00');
+      const left = Math.max(0, e.spots - e.going);
+      return {
+        mon: d.toLocaleDateString(undefined, { month: 'short' }).toUpperCase(),
+        day: d.getDate(),
+        name: e.name, kind: e.kind, time: this.t12(e.time), when: this.when(e.date),
+        spotsLabel: left > 0 ? left + ' spots left' : 'Full — waitlist',
+        spotsColor: left > 3 ? 'var(--gray-400)' : left > 0 ? 'var(--amber-600)' : 'var(--status-danger)',
+        open: () => this.setState({ sub: 'event', selId: e.id, tab: 'schedule' })
+      };
+    });
+
+    const sel = events.filter(e => e.id === s.selId)[0] || {};
+    const selLeft = Math.max(0, (sel.spots || 0) - (sel.going || 0));
+    const rsvped = s.rsvps.indexOf(s.selId) > -1;
+    const selDate = sel.date ? new Date(sel.date + 'T00:00:00') : null;
+    const going = [];
+    for (let i = 0; i < Math.min(8, sel.going || 0) && roster.length; i++) going.push({ initials: this.inits(roster[i % roster.length].name) });
+
+    const sortedPosts = posts.slice().sort((a, b) => (a.pinned === b.pinned ? b.at - a.at : (a.pinned ? -1 : 1)));
+    const top = sortedPosts[0] || {};
+
+    const checkins = s.checkins || {};
+    const here = roster.filter(m => checkins[m.id] && m.visible);
+    const hereHidden = Math.max(0, head - here.length);
+
+    const tabDefs = [
+      { key: 'home', label: 'Now', icon: 'ph-bold ph-barbell' },
+      { key: 'board', label: 'Board', icon: 'ph-bold ph-megaphone' },
+      { key: 'schedule', label: 'Schedule', icon: 'ph-bold ph-calendar-blank' },
+      { key: 'profile', label: 'You', icon: 'ph-bold ph-user' }
+    ];
+    if (isExec) tabDefs.push({ key: 'manage', label: 'Manage', icon: 'ph-bold ph-sliders-horizontal' });
+
+    const stepMeta = [
+      { title: 'Who are you?', sub: 'Name and school email — execs use this to build the roster.', cta: 'Continue' },
+      { title: 'Password & safety', sub: 'Emergency contact is required before you touch a bar.', cta: 'Continue' },
+      { title: 'Sign the waiver', sub: 'Read it. Both boxes are required.', cta: 'Create account' }
+    ][s.step - 1];
+
+    const nextBlocked = s.step === 3 && !(s.suWaiver && s.suCoc);
+    const ec = [u.ec_name, u.ec_phone].filter(Boolean).join(' · ');
+
+    return {
+      isAuth: s.route !== 'app', isApp: s.route === 'app',
+      atWelcome: s.route === 'welcome', atLogin: s.route === 'login', atSignup: s.route === 'signup',
+      goWelcome: () => this.setState({ route: 'welcome', err: '' }),
+      goLogin: () => this.setState({ route: 'login', err: '' }),
+      goSignup: () => this.setState({ route: 'signup', step: 1, err: '' }),
+      signupBack: () => s.step === 1 ? this.setState({ route: 'welcome', err: '' }) : this.setState({ step: s.step - 1, err: '' }),
+      signupNext: this.signupNext, doLogin: this.doLogin,
+      email: s.email, pass: s.pass, err: s.err, hasErr: !!s.err,
+      setEmail: e => this.setState({ email: e.target.value }),
+      setPass: e => this.setState({ pass: e.target.value }),
+      fillExec: () => this.setState({ email: 'priya@wlmac.ca', pass: 'lift2027', err: '' }),
+      fillMember: () => this.setState({ email: 'sam@wlmac.ca', pass: 'squat123', err: '' }),
+      showDemoLogins: !this.sb,
+
+      step: s.step, stepPct: s.step * 33.4, stepTitle: stepMeta.title, stepSub: stepMeta.sub, stepCta: stepMeta.cta,
+      step1: s.step === 1, step2: s.step === 2, step3: s.step === 3, nextBlocked: nextBlocked,
+      grades: ['Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'],
+      suName: s.suName, suEmail: s.suEmail, suGrade: s.suGrade, suPass: s.suPass, suEcName: s.suEcName, suEcPhone: s.suEcPhone,
+      suWaiver: s.suWaiver, suCoc: s.suCoc, suVisible: s.suVisible,
+      setSuName: e => this.setState({ suName: e.target.value }),
+      setSuEmail: e => this.setState({ suEmail: e.target.value }),
+      setSuGrade: e => this.setState({ suGrade: e.target.value }),
+      setSuPass: e => this.setState({ suPass: e.target.value }),
+      setSuEcName: e => this.setState({ suEcName: e.target.value }),
+      setSuEcPhone: e => this.setState({ suEcPhone: e.target.value }),
+      setSuWaiver: v => this.setState({ suWaiver: v }),
+      setSuCoc: v => this.setState({ suCoc: v }),
+      setSuVisible: v => this.setState({ suVisible: v }),
+
+      roleLine: isExec ? (u.title || 'Exec') + ' · Exec' : 'Member · ' + (u.grade || ''),
+      initials: this.inits(u.name), goProfile: () => this.go('profile'),
+      avatarBg: u.avatar_url ? "url('" + u.avatar_url + "')" : 'none', uploadAvatar: this.uploadAvatar,
+      tabs: tabDefs.map(t => ({
+        label: t.label, icon: t.icon, active: s.tab === t.key,
+        color: s.tab === t.key ? 'var(--red-500)' : 'var(--gray-500)',
+        dot: t.key === 'board' && sortedPosts.length > 3,
+        go: () => this.go(t.key)
+      })),
+
+      tabHome: s.tab === 'home', tabBoard: s.tab === 'board',
+      tabSchedule: s.tab === 'schedule' && s.sub !== 'event', atEvent: s.sub === 'event',
+      tabProfile: s.tab === 'profile', tabManage: s.tab === 'manage',
+
+      count: head, cap: cap, isExec: isExec, zoneColor: z.color, zoneLabel: z.label, zoneNote: z.note,
+      fillPct: Math.round(pct), fillLabel: Math.round(pct) + '%', ringDeg: Math.round(pct * 3.6),
+      plates: plates, stamp: 'Updated ' + this.ago(s.updatedAt),
+      gPlates: gauge === 'Plate rack', gBar: gauge === 'Capacity bar', gRing: gauge === 'Crest ring',
+
+      showPresent: wantPresent && here.length > 0,
+      hasNext: !!nx.name, hasTopPost: !!top.author,
+      present: here.map(m => ({ initials: this.inits(m.name), first: this.first(m.name) })),
+      hiddenNote: hereHidden > 0 ? '+' + hereHidden + ' private' : 'all opted in',
+
+      nextTitle: nx.name || '', nextType: nx.kind || '', nextLoc: nx.loc || '',
+      nextDate: nx.date ? this.when(nx.date) + ' · ' + this.t12(nx.time) : '',
+      nextSpots: nx.spots != null ? Math.max(0, nx.spots - nx.going) : null,
+      nextOpen: () => this.setState({ tab: 'schedule', sub: 'event', selId: nx.id }),
+      goSchedule: () => this.go('schedule'), goBoard: () => this.go('board'),
+
+      topPostAuthor: top.author || '', topPostAgo: top.at ? this.ago(top.at) : '', topPostText: top.text || '',
+      posts: sortedPosts.map(p => ({
+        text: p.text, author: p.author, title: p.title, pinned: p.pinned,
+        ago: this.ago(p.at) + (p.edited ? ' · edited' : ''), initials: this.inits(p.author),
+        border: p.pinned ? 'var(--red-700)' : 'var(--ink-700)',
+        pinLabel: p.pinned ? 'Unpin' : 'Pin',
+        pin: () => this.togglePin(p.id),
+        edit: () => this.editPost(p),
+        del: () => this.deletePost(p.id)
+      })),
+      feedCards: feed === 'Cards', feedBulletin: feed === 'Bulletin',
+
+      filters: ['All', 'Powerlifting', 'Calisthenics', 'Open Lift', 'Guest Speaker'].map(f => ({
+        label: f, active: s.filter === f, go: () => this.setState({ filter: f })
+      })),
+      events: fEvents,
+
+      closeSub: () => this.setState({ sub: null }),
+      selName: sel.name || '', selKind: sel.kind || '', selDesc: sel.desc || '',
+      selMeta: [
+        { icon: 'ph-bold ph-calendar-blank', label: 'Date', value: selDate ? selDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : '' },
+        { icon: 'ph-bold ph-clock', label: 'Time', value: this.t12(sel.time) },
+        { icon: 'ph-bold ph-map-pin', label: 'Where', value: sel.loc || '' },
+        { icon: 'ph-bold ph-users-three', label: 'Spots', value: selLeft > 0 ? selLeft + ' of ' + sel.spots + ' left' : 'Full' }
+      ],
+      rsvpLabel: rsvped ? 'You are in — tap to cancel' : selLeft > 0 ? 'Sign me up' : 'Join the waitlist',
+      rsvpVariant: rsvped ? 'secondary' : 'primary',
+      toggleRsvp: this.toggleRsvp,
+      selGoing: going, selGoingLabel: (sel.going || 0) + ' of ' + (sel.spots || 0),
+      editSel: () => this.editEvent(sel), deleteSel: () => this.deleteEvent(sel.id),
+
+      userName: u.name || '', userGrade: u.grade || '', userEmail: u.email || '', userEc: ec || '—',
+      roleLabel: isExec ? (u.title || 'Exec') : 'Member', roleTone: isExec ? 'red' : 'outline',
+      statSessions: u.sessions != null ? u.sessions : 0, statRsvps: s.rsvps.length,
+      userVisible: u.visible !== false,
+      setUserVisible: this.setUserVisible,
+      visibleNote: u.visible !== false ? 'Your first name shows on the Now screen while you are in the room.' : 'You still count toward the number — your name stays hidden.',
+      signOut: this.signOut,
+
+      mgHome: !s.sub, mgCount: s.sub === 'count', mgPost: s.sub === 'post', mgEvent: s.sub === 'newEvent', mgMembers: s.sub === 'members',
+      mgBack: () => this.setState({ sub: null, err: '' }),
+      mgTiles: [
+        { icon: 'ph-bold ph-barbell', label: 'Check-in', meta: head + ' of ' + cap + ' · ' + z.label, go: () => this.setState({ sub: 'count', capDraft: String(cap) }) },
+        { icon: 'ph-bold ph-megaphone', label: 'Post to board', meta: sortedPosts.length + ' posts', go: () => this.setState({ sub: 'post', editPostId: null, postText: '', postPin: false, postPush: true }) },
+        { icon: 'ph-bold ph-calendar-plus', label: 'New event', meta: events.length + ' scheduled', go: () => this.setState({ sub: 'newEvent', err: '', editEventId: null, evName: '', evDate: '', evTime: '', evKind: 'Powerlifting', evLoc: 'Weight Room', evSpots: '20', evDesc: '' }) },
+        { icon: 'ph-bold ph-users-three', label: 'Members', meta: roster.length + ' registered', go: () => this.setState({ sub: 'members' }) }
+      ],
+      rsvpRows: sorted.map(e => ({ name: e.name, date: this.when(e.date) + ' · ' + this.t12(e.time), going: e.going, spots: e.spots })),
+
+      guests: s.guests,
+      incGuest: () => this.bumpGuests(1), decGuest: () => this.bumpGuests(-1), clearRoom: this.clearRoom,
+      inRoomLine: Object.keys(checkins).filter(id => checkins[id]).length + ' checked in' + (s.guests > 0 ? ' · ' + s.guests + ' drop-in' + (s.guests === 1 ? '' : 's') : ''),
+      roomList: roster.map(m => {
+        const inRoom = !!checkins[m.id];
+        return {
+          name: m.name, grade: m.grade, initials: this.inits(m.name), in: inRoom,
+          bg: inRoom ? 'rgba(200,16,46,0.12)' : 'var(--surface-card)',
+          border: inRoom ? 'var(--red-700)' : 'var(--ink-700)',
+          boxBg: inRoom ? 'var(--red-600)' : 'transparent',
+          boxBorder: inRoom ? 'var(--red-600)' : 'var(--border-strong)',
+          stateLabel: inRoom ? 'In' : 'Out',
+          stateColor: inRoom ? 'var(--red-500)' : 'var(--gray-500)',
+          toggle: () => this.toggleHere(m.id, m.name)
+        };
+      }),
+      capDraft: s.capDraft == null ? String(cap) : s.capDraft,
+      setCapDraft: e => this.setState({ capDraft: e.target.value }),
+      saveCap: this.saveCap,
+
+      postText: s.postText, postPin: s.postPin, postPush: s.postPush,
+      setPostText: e => this.setState({ postText: e.target.value }),
+      setPostPin: v => this.setState({ postPin: v }),
+      setPostPush: v => this.setState({ postPush: v }),
+      savePost: this.savePost,
+      postHeading: s.editPostId ? 'Edit post' : 'Post to the board',
+      postSub: s.editPostId ? 'Fix a typo, change the pin, or rewrite it entirely.' : 'Short and direct. Members read this on the way to class.',
+      postCta: s.editPostId ? 'Save changes' : 'Post it',
+      newPost: !s.editPostId,
+      evHeading: s.editEventId ? 'Edit event' : 'New event',
+      evSub: s.editEventId ? 'Changes show on every member\u2019s schedule right away.' : 'It hits the schedule immediately.',
+      evCta: s.editEventId ? 'Save changes' : 'Publish event',
+
+      kinds: ['Powerlifting', 'Calisthenics', 'Open Lift', 'Guest Speaker'],
+      evName: s.evName, evDate: s.evDate, evTime: s.evTime, evKind: s.evKind, evLoc: s.evLoc, evSpots: s.evSpots, evDesc: s.evDesc,
+      setEvName: e => this.setState({ evName: e.target.value }),
+      setEvDate: e => this.setState({ evDate: e.target.value }),
+      setEvTime: e => this.setState({ evTime: e.target.value }),
+      setEvKind: e => this.setState({ evKind: e.target.value }),
+      setEvLoc: e => this.setState({ evLoc: e.target.value }),
+      setEvSpots: e => this.setState({ evSpots: e.target.value }),
+      setEvDesc: e => this.setState({ evDesc: e.target.value }),
+      saveEvent: this.saveEvent,
+
+      memberCountLine: roster.length + ' registered · ' + roster.filter(m => !m.visible).length + ' keep their name private',
+      members: roster.map(m => ({
+        name: m.name, email: m.email, grade: m.grade, initials: this.inits(m.name),
+        visLabel: m.visible ? 'Public' : 'Private',
+        visIcon: m.visible ? 'ph-bold ph-eye' : 'ph-bold ph-eye-slash',
+        visColor: m.visible ? 'var(--gray-400)' : 'var(--gray-500)'
+      })),
+
+      toast: s.toast, hasToast: !!s.toast, push: s.push, hasPush: !!s.push,
+
+      sbConnected: !!this.sb, sbNotConnected: !this.sb,
+      sbUrlDraft: s.sbUrlDraft, sbKeyDraft: s.sbKeyDraft,
+      setSbUrlDraft: e => this.setState({ sbUrlDraft: e.target.value }),
+      setSbKeyDraft: e => this.setState({ sbKeyDraft: e.target.value }),
+      connectSb: this.connectSb, disconnectSb: this.disconnectSb
+    };
+  }
+}
+</script>
+</body>
+</html>
