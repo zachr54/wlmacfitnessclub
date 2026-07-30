@@ -779,8 +779,11 @@ class Component extends DCLogic {
     const meta = (au && au.user && au.user.user_metadata) || {};
     const email = (au && au.user && au.user.email) || '';
     const fallbackUser = { id, email, name: meta.name || email.split('@')[0] || 'Member', grade: meta.grade || '', role: 'member', title: 'Member', ec_name: meta.ec_name || '', ec_phone: meta.ec_phone || '', visible: meta.visible !== false, waiver_signed: true };
-    await this.sb.from('profiles').upsert(fallbackUser);
-    this.setState({ route: 'app', tab: 'home', user: fallbackUser });
+    // ignoreDuplicates: only inserts if the row is truly missing — never overwrites an existing row's role/data.
+    await this.sb.from('profiles').upsert(fallbackUser, { onConflict: 'id', ignoreDuplicates: true });
+    const retry = await this.sb.from('profiles').select('*').eq('id', id).single();
+    const finalUser = (!retry.error && retry.data) ? retry.data : fallbackUser;
+    this.setState({ route: 'app', tab: 'home', user: finalUser });
     this.loadMyRsvps(id);
   }
 
