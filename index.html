@@ -695,9 +695,12 @@ class Component extends DCLogic {
     try { this.sb = window.supabase.createClient(url, key); }
     catch (e) { this.say('Could not connect — check the URL and key.'); return this.loadMock(); }
     this.forceUpdate();
-    await Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom()]);
+    // Restore the session BEFORE any table reads — createClient() doesn't restore a
+    // persisted session synchronously, so reads fired earlier go out unauthenticated
+    // and get denied by RLS (403), even though a valid session exists moments later.
     const { data } = await this.sb.auth.getSession();
     if (data && data.session) await this.loadSessionUser(data.session.user.id);
+    await Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom()]);
     this.sb.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, rsvps: [] });
     });
@@ -766,13 +769,20 @@ class Component extends DCLogic {
     if (upErr) return this.say(upErr.message);
     const { data } = this.sb.storage.from('avatars').getPublicUrl(path);
     const url = data.publicUrl + '?t=' + Date.now();
-    await this.sb.from('profiles').update({ avatar_url: url }).eq('id', this.state.user.id);
+    const { error: dbErr } = await this.sb.from('profiles').update({ avatar_url: url }).eq('id', this.state.user.id);
+    if (dbErr) return this.say('Photo uploaded but not saved: ' + dbErr.message);
     this.setState(s => ({ user: { ...s.user, avatar_url: url } }));
     this.say('Profile photo updated.');
   };
   async loadSessionUser(id) {
     const { data, error } = await this.sb.from('profiles').select('*').eq('id', id).single();
     if (!error && data) { this.setState({ user: data, route: 'app', tab: 'home' }); this.loadMyRsvps(id); return; }
+    if (error && error.code !== 'PGRST116') {
+      // Real error (RLS denial, network, etc) — surface it instead of silently
+      // falling back to a hardcoded 'member' role, which would mask exec accounts.
+      this.say('Could not load your profile: ' + error.message);
+      return;
+    }
     // No profile row yet (e.g. account created before the row-creation trigger ran, or trigger
     // missed it) — recover the name/email from the auth session and create the row ourselves.
     const { data: au } = await this.sb.auth.getUser();
@@ -867,7 +877,7 @@ class Component extends DCLogic {
       if (error) return this.setState({ err: error.message });
       await this.loadSessionUser(data.user.id);
       this.setState({ pass: '' });
-      this.say('Logged in as ' + this.first((this.state.user || {}).name));
+      if (this.state.route === 'app') this.say('Logged in as ' + this.first((this.state.user || {}).name));
       return;
     }
     const a = this.mockAccounts().filter(x => x.email === this.state.email.trim().toLowerCase() && x.pass === this.state.pass)[0];
@@ -897,7 +907,7 @@ class Component extends DCLogic {
       if (error) return this.setState({ err: error.message });
       if (data.session) {
         await this.loadSessionUser(data.user.id);
-        this.say('You are in. Welcome to the club.');
+        if (this.state.route === 'app') this.say('You are in. Welcome to the club.');
       } else {
         this.setState({ route: 'login', err: '', email: s.suEmail.trim().toLowerCase() });
         this.say('Check your email to confirm your account, then log in.');
