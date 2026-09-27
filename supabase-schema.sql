@@ -178,6 +178,16 @@ create trigger trg_rsvp_insert after insert on public.rsvps for each row execute
 drop trigger if exists trg_rsvp_delete on public.rsvps;
 create trigger trg_rsvp_delete after delete on public.rsvps for each row execute function public.bump_going();
 
+-- ---------- table access for logged-in users ----------
+-- Newer Supabase projects don't auto-grant table access; without these the app gets
+-- "permission denied for table ...". The RLS policies above still decide who can do what.
+grant select, insert, update on public.profiles to authenticated;
+grant select, update on public.checkins to authenticated;
+grant select, update on public.room_state to authenticated;
+grant select, insert, update, delete on public.events to authenticated;
+grant select, insert, update, delete on public.posts to authenticated;
+grant select, insert, delete on public.rsvps to authenticated;
+
 -- ---------- realtime ----------
 alter publication supabase_realtime add table
   public.profiles, public.checkins, public.room_state, public.events, public.posts, public.rsvps;
