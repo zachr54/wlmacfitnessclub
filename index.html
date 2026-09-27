@@ -37,6 +37,7 @@ a:hover{color:var(--white)}
 @keyframes wl-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes wl-drop{from{opacity:0;transform:translateY(-70px)}to{opacity:1;transform:none}}
 @keyframes wl-breathe{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1)}}
+@keyframes wl-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
 </style>
 </helmet>
 
@@ -168,6 +169,14 @@ a:hover{color:var(--white)}
 
 <sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
 <div style="display:flex;flex-direction:column;gap:26px;animation:wl-rise .28s var(--ease-standard)">
+
+<sc-if value="{{ roomLoading }}">
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:18px 18px 16px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">In the weight room</span>
+<div style="width:42%;height:70px;margin:14px 0 16px;border-radius:var(--radius-sm);background:linear-gradient(90deg,var(--ink-800) 25%,var(--ink-700) 50%,var(--ink-800) 75%);background-size:200% 100%;animation:wl-shimmer 1.4s linear infinite"></div>
+<div style="height:34px;border-radius:var(--radius-sm);background:linear-gradient(90deg,var(--ink-800) 25%,var(--ink-700) 50%,var(--ink-800) 75%);background-size:200% 100%;animation:wl-shimmer 1.4s linear infinite"></div>
+</div>
+</sc-if>
 
 <sc-if value="{{ gymClosed }}">
 <div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:18px">
@@ -747,7 +756,7 @@ class Component extends DCLogic {
     suName: '', suEmail: '', suGrade: 'Grade 9', suPass: '', suEcName: '', suEcPhone: '',
     suWaiver: false, suCoc: false, suVisible: true,
     user: this.boot.user,
-    roster: null, checkins: {}, guests: 2, capacity: null, isOpen: null, updatedAt: Date.now(),
+    roster: null, checkins: {}, guests: 0, capacity: null, isOpen: null, updatedAt: Date.now(),
     filter: 'All', rsvps: [],
     toast: null, push: null,
     capDraft: null, editPostId: null, editEventId: null,
@@ -826,9 +835,9 @@ class Component extends DCLogic {
     // persisted session synchronously, so reads fired earlier go out unauthenticated
     // and get denied by RLS (403), even though a valid session exists moments later.
     const { data } = await this.sb.auth.getSession();
+    // Club data is only readable once logged in, so loadSessionUser() fetches it (here and after login).
     if (data && data.session) await this.loadSessionUser(data.session.user.id);
     else this.bootFailed();
-    await Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom(), this.loadLifts()]);
     this.sb.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') { this.cacheUser(null); this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, rsvps: [] }); }
     });
@@ -910,11 +919,17 @@ class Component extends DCLogic {
     this.cacheUser({ ...this.state.user, avatar_url: url });
     this.say('Profile photo updated.');
   };
+  loadClubData() {
+    return Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom(), this.loadLifts()]);
+  }
   async loadSessionUser(id) {
+    // Fetch club data alongside the profile rather than after it, so the count shows sooner.
+    this.loadClubData();
+    this.loadMyRsvps(id);
     const { data, error } = await this.sb.from('profiles').select('*').eq('id', id).single();
     // Keep the current tab if we opened straight into the app from the cached profile.
     const enter = u => { this.cacheUser(u); this.setState(s => ({ user: u, route: 'app', tab: s.route === 'app' ? s.tab : 'home' })); };
-    if (!error && data) { enter(data); this.loadMyRsvps(id); this.loadLifts(); return; }
+    if (!error && data) { enter(data); return; }
     if (error && error.code !== 'PGRST116') {
       // Real error (RLS denial, network, etc) — surface it instead of silently
       // falling back to a hardcoded 'member' role, which would mask exec accounts.
@@ -933,8 +948,6 @@ class Component extends DCLogic {
     const retry = await this.sb.from('profiles').select('*').eq('id', id).single();
     const finalUser = (!retry.error && retry.data) ? retry.data : fallbackUser;
     enter(finalUser);
-    this.loadMyRsvps(id);
-    this.loadLifts();
   }
 
   iso(days) { const d = new Date(); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); }
@@ -1448,13 +1461,14 @@ class Component extends DCLogic {
       plates: plates, stamp: 'Updated ' + this.ago(s.updatedAt),
       gPlates: gauge === 'Plate rack', gBar: gauge === 'Capacity bar', gRing: gauge === 'Crest ring',
 
-      gymOpen: s.isOpen !== false, gymClosed: s.isOpen === false, isOpen: s.isOpen !== false,
+      // isOpen is null until room_state loads: show a placeholder, not a made-up count.
+      roomLoading: s.isOpen === null, gymOpen: s.isOpen === true, gymClosed: s.isOpen === false, isOpen: s.isOpen === true,
       setGymOpen: this.setGymOpen, toggleSelf: this.toggleSelf,
       selfLabel: checkins[u.id] ? 'You’re in — tap when you leave' : 'I’m at the gym',
       selfVariant: checkins[u.id] ? 'secondary' : 'primary',
       openBorder: s.isOpen === false ? 'var(--ink-700)' : 'var(--red-700)',
       openNote: s.isOpen === false ? 'Closed. Turn this on when the room opens so the live count shows and members can check in.' : 'Open. Turning this off checks everyone out and shows GYM CLOSED on the home screen.',
-      showPresent: wantPresent && here.length > 0 && s.isOpen !== false,
+      showPresent: wantPresent && here.length > 0 && s.isOpen === true,
       hasNext: !!nx.name, hasTopPost: !!top.author,
       present: here.map(m => ({ initials: this.inits(m.name), first: this.first(m.name), avatarBg: this.bg(m.avatar_url) })),
       hiddenNote: hereHidden > 0 ? '+' + hereHidden + ' private' : 'all opted in',
@@ -1507,7 +1521,7 @@ class Component extends DCLogic {
       mgHome: !s.sub, mgCount: s.sub === 'count', mgPost: s.sub === 'post', mgEvent: s.sub === 'newEvent', mgMembers: s.sub === 'members', mgPrs: s.sub === 'prs',
       mgBack: () => this.setState({ sub: null, err: '' }),
       mgTiles: [
-        { icon: 'ph-bold ph-barbell', label: 'Check-in', meta: s.isOpen === false ? 'Gym closed' : head + ' of ' + cap + ' · ' + z.label, go: () => this.setState({ sub: 'count', capDraft: String(cap) }) },
+        { icon: 'ph-bold ph-barbell', label: 'Check-in', meta: s.isOpen === null ? 'Loading…' : s.isOpen === false ? 'Gym closed' : head + ' of ' + cap + ' · ' + z.label, go: () => this.setState({ sub: 'count', capDraft: String(cap) }) },
         { icon: 'ph-bold ph-megaphone', label: 'Post to board', meta: sortedPosts.length + ' posts', go: () => this.setState({ sub: 'post', editPostId: null, postText: '', postPin: false, postPush: true }) },
         { icon: 'ph-bold ph-calendar-plus', label: 'New event', meta: events.length + ' scheduled', go: () => this.setState({ sub: 'newEvent', err: '', editEventId: null, evName: '', evDate: '', evTime: '', evKind: 'Powerlifting', evLoc: 'Weight Room', evSpots: '20', evDesc: '' }) },
         { icon: 'ph-bold ph-users-three', label: 'Members', meta: roster.length + ' registered', go: () => this.setState({ sub: 'members' }) },
