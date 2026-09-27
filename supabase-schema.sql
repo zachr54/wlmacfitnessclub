@@ -181,3 +181,17 @@ create trigger trg_rsvp_delete after delete on public.rsvps for each row execute
 -- ---------- realtime ----------
 alter publication supabase_realtime add table
   public.profiles, public.checkins, public.room_state, public.events, public.posts, public.rsvps;
+
+-- ---------- lifts (leaderboard PRs, one row per member, kg) ----------
+-- Already ran the file above? Run just this section in the SQL Editor.
+create table if not exists public.lifts (
+  profile_id uuid primary key references public.profiles(id) on delete cascade,
+  squat numeric(6,1) check (squat is null or squat > 0),
+  bench numeric(6,1) check (bench is null or bench > 0),
+  deadlift numeric(6,1) check (deadlift is null or deadlift > 0),
+  updated_at timestamptz not null default now()
+);
+alter table public.lifts enable row level security;
+create policy "lifts_select_all" on public.lifts for select using (auth.role() = 'authenticated');
+create policy "lifts_write_exec" on public.lifts for all using (public.is_exec()) with check (public.is_exec());
+alter publication supabase_realtime add table public.lifts;

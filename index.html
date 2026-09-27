@@ -216,7 +216,10 @@ a:hover{color:var(--white)}
 <div style="display:flex;flex-wrap:wrap;gap:8px">
 <sc-for list="{{ present }}" as="m" hint-placeholder-count="5">
 <span style="display:flex;align-items:center;gap:8px;background:var(--ink-800);border:1px solid var(--ink-700);border-radius:var(--radius-pill);padding:5px 12px 5px 5px">
-<span style="width:26px;height:26px;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:.03em;color:var(--white)">{{ m.initials }}</span>
+<span style="width:26px;height:26px;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:.03em;color:var(--white);overflow:hidden;position:relative">
+<span style="position:relative;z-index:0">{{ m.initials }}</span>
+<span style="position:absolute;inset:0;z-index:1;background-size:cover;background-position:center;background-image:{{ m.avatarBg }}"></span>
+</span>
 <span style="font-family:var(--font-heading);font-weight:600;font-size:13px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--gray-200)">{{ m.first }}</span>
 </span>
 </sc-for>
@@ -375,6 +378,45 @@ a:hover{color:var(--white)}
 <div style="display:flex;flex-wrap:wrap;gap:7px">
 <sc-for list="{{ selGoing }}" as="g" hint-placeholder-count="6">
 <span style="width:34px;height:34px;border-radius:50%;background:var(--ink-800);border:1px solid var(--ink-600);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--gray-200)">{{ g.initials }}</span>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ tabLifts }}">
+<div style="animation:wl-rise .28s var(--ease-standard)">
+<div style="font-family:var(--font-display);font-size:38px;line-height:1;text-transform:uppercase;color:var(--white)">Leaderboard</div>
+<p style="margin:8px 0 18px;font-size:14.5px;color:var(--text-secondary)">Club PRs in kg, entered by the execs.</p>
+<div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:16px">
+<sc-for list="{{ liftFilters }}" as="f" hint-placeholder-count="4">
+<span style="flex:none"><x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Tag" active="{{ f.active }}" onClick="{{ f.go }}" hint-size="auto,32px">{{ f.label }}</x-import></span>
+</sc-for>
+</div>
+<sc-if value="{{ isExec }}">
+<div style="display:grid;margin-bottom:16px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" variant="secondary" onClick="{{ newPr }}" hint-size="100%,46px">Enter a PR</x-import>
+</div>
+</sc-if>
+<sc-if value="{{ noLifts }}">
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:20px;text-align:center;font-size:14px;color:var(--gray-400)">No {{ liftLabel }} PRs on the board yet.</div>
+</sc-if>
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{ liftRows }}" as="r" hint-placeholder-count="6">
+<button onClick="{{ r.open }}" style="width:100%;text-align:left;display:grid;grid-template-columns:28px 34px 1fr auto;gap:12px;align-items:center;background:var(--surface-card);border:1px solid {{ r.border }};border-radius:var(--radius-md);padding:11px 14px;cursor:{{ r.cursor }}">
+<span style="font-family:var(--font-display);font-size:22px;line-height:1;text-align:center;font-variant-numeric:tabular-nums;color:{{ r.rankColor }}">{{ r.rank }}</span>
+<span style="width:34px;height:34px;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--white);overflow:hidden;position:relative">
+<span style="position:relative;z-index:0">{{ r.initials }}</span>
+<span style="position:absolute;inset:0;z-index:1;background-size:cover;background-position:center;background-image:{{ r.avatarBg }}"></span>
+</span>
+<span style="display:flex;flex-direction:column;gap:2px;min-width:0">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</span>
+<span style="font-size:11.5px;color:var(--gray-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.sub }}</span>
+</span>
+<span style="display:flex;align-items:baseline;gap:3px">
+<span style="font-family:var(--font-display);font-size:24px;line-height:1;font-variant-numeric:tabular-nums;color:var(--white)">{{ r.value }}</span>
+<span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">kg</span>
+</span>
+</button>
 </sc-for>
 </div>
 </div>
@@ -597,6 +639,24 @@ a:hover{color:var(--white)}
 </div>
 </sc-if>
 
+<sc-if value="{{ mgPrs }}">
+<div>
+<button onClick="{{ prBack }}" style="background:none;border:none;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>{{ prBackLabel }}</button>
+<div style="font-family:var(--font-display);font-size:32px;line-height:1;text-transform:uppercase;color:var(--white)">Enter PRs</div>
+<p style="margin:8px 0 22px;font-size:14.5px;color:var(--text-secondary)">Pick a lifter and enter their best squat, bench and deadlift in kg. Leave a lift blank to take it off the board.</p>
+<div style="display:grid;gap:16px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Select" label="Lifter" options="{{ prOptions }}" value="{{ prPick }}" onChange="{{ setPrPick }}" hint-size="100%,72px"></x-import>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Squat" type="number" placeholder="kg" value="{{ prSquat }}" onChange="{{ setPrSquat }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Bench" type="number" placeholder="kg" value="{{ prBench }}" onChange="{{ setPrBench }}" hint-size="100%,72px"></x-import>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Deadlift" type="number" placeholder="kg" value="{{ prDead }}" onChange="{{ setPrDead }}" hint-size="100%,72px"></x-import>
+</div>
+<sc-if value="{{ hasErr }}"><p style="margin:0;font-size:14px;color:var(--status-danger)">{{ err }}</p></sc-if>
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" onClick="{{ savePr }}" hint-size="100%,54px">Save PRs</x-import>
+</div>
+</div>
+</sc-if>
+
 </div>
 </sc-if>
 
@@ -651,6 +711,7 @@ class Component extends DCLogic {
     evName: '', evDate: '', evTime: '', evKind: 'Powerlifting', evLoc: 'Weight Room', evSpots: '20', evDesc: '',
     postText: '', postPin: false, postPush: true,
     events: null, posts: null, tick: 0,
+    lifts: null, liftFilter: 'Total', prId: null, prSquat: '', prBench: '', prDead: '', prFrom: 'manage',
     sbUrlDraft: '', sbKeyDraft: '',
   };
 
@@ -706,7 +767,7 @@ class Component extends DCLogic {
     // and get denied by RLS (403), even though a valid session exists moments later.
     const { data } = await this.sb.auth.getSession();
     if (data && data.session) await this.loadSessionUser(data.session.user.id);
-    await Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom()]);
+    await Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom(), this.loadLifts()]);
     this.sb.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, rsvps: [] });
     });
@@ -715,7 +776,8 @@ class Component extends DCLogic {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'room_state' }, () => this.loadRoom())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'events' }, () => this.loadEvents())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => this.loadPosts())
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => this.loadRoster())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => { this.loadRoster(); this.loadLifts(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'lifts' }, () => this.loadLifts())
       .subscribe();
   }
 
@@ -723,7 +785,7 @@ class Component extends DCLogic {
     const roster = this.mockRoster();
     const checkins = {};
     roster.forEach(m => { checkins[m.id] = !!m.here; });
-    this.setState({ roster: roster, checkins: checkins, guests: 2, events: this.seedEvents(), posts: this.seedPosts() });
+    this.setState({ roster: roster, checkins: checkins, guests: 2, events: this.seedEvents(), posts: this.seedPosts(), lifts: this.seedLifts() });
     const start = this.props.startSignedInAs;
     if (start === 'Member') this.setState({ user: this.mockAccounts()[2], route: 'app' });
     if (start === 'Exec') this.setState({ user: this.mockAccounts()[0], route: 'app' });
@@ -762,6 +824,11 @@ class Component extends DCLogic {
     const { data, error } = await this.sb.from('room_state').select('*').eq('id', 1).single();
     if (!error && data) this.setState({ guests: data.guests, capacity: data.capacity, updatedAt: Date.now() });
   }
+  async loadLifts() {
+    const { data, error } = await this.sb.from('lifts').select('profile_id, squat, bench, deadlift, profiles(name, grade, avatar_url)');
+    const num = v => v != null ? Number(v) : null;
+    if (!error) this.setState({ lifts: data.filter(l => l.profiles).map(l => ({ id: l.profile_id, name: l.profiles.name, grade: l.profiles.grade, avatar_url: l.profiles.avatar_url, squat: num(l.squat), bench: num(l.bench), deadlift: num(l.deadlift) })) });
+  }
   async loadMyRsvps(profileId) {
     const { data, error } = await this.sb.from('rsvps').select('event_id').eq('profile_id', profileId);
     if (!error) this.setState({ rsvps: data.map(r => r.event_id) });
@@ -782,7 +849,7 @@ class Component extends DCLogic {
   };
   async loadSessionUser(id) {
     const { data, error } = await this.sb.from('profiles').select('*').eq('id', id).single();
-    if (!error && data) { this.setState({ user: data, route: 'app', tab: 'home' }); this.loadMyRsvps(id); return; }
+    if (!error && data) { this.setState({ user: data, route: 'app', tab: 'home' }); this.loadMyRsvps(id); this.loadLifts(); return; }
     if (error && error.code !== 'PGRST116') {
       // Real error (RLS denial, network, etc) — surface it instead of silently
       // falling back to a hardcoded 'member' role, which would mask exec accounts.
@@ -801,6 +868,7 @@ class Component extends DCLogic {
     const finalUser = (!retry.error && retry.data) ? retry.data : fallbackUser;
     this.setState({ route: 'app', tab: 'home', user: finalUser });
     this.loadMyRsvps(id);
+    this.loadLifts();
   }
 
   iso(days) { const d = new Date(); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); }
@@ -821,6 +889,11 @@ class Component extends DCLogic {
       { id: 2, pinned: false, author: 'Devon Achebe', title: 'Meet Director', at: Date.now() - h * 30, text: 'Sign-ups for the Fall Deadlift Meet close Thursday. 19 of 24 spots gone. See a captain to get on the roster.' },
       { id: 3, pinned: false, author: 'Priya Raman', title: 'President', at: Date.now() - h * 74, text: 'Chalk is restocked. Wipe the bar down when you rack it — Mr. Delgado will pull our room privileges otherwise.' }
     ];
+  }
+
+  seedLifts() {
+    const prs = { 'devon@wlmac.ca': [175, 120, 210], 'priya@wlmac.ca': [110, 62.5, 142.5], 'sam@wlmac.ca': [140, 95, 180], 'ife@wlmac.ca': [125, 80, 160], 'mia@wlmac.ca': [null, 45, 100] };
+    return this.mockRoster().filter(m => prs[m.id]).map(m => ({ id: m.id, name: m.name, grade: m.grade, avatar_url: null, squat: prs[m.id][0], bench: prs[m.id][1], deadlift: prs[m.id][2] }));
   }
 
   ago(ts) {
@@ -853,6 +926,8 @@ class Component extends DCLogic {
   }
 
   inits(n) { return String(n || '').trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase(); }
+  bg(url) { return url ? "url('" + url + "')" : 'none'; }
+  kg(n) { return n == null ? '—' : String(Math.round(n * 10) / 10); }
   first(n) { return String(n || '').split(' ')[0]; }
 
   cap() { return Math.max(1, this.state.capacity != null ? this.state.capacity : (this.props.roomCapacity || 20)); }
@@ -1087,6 +1162,43 @@ class Component extends DCLogic {
     this.say(on ? 'Spot released' : 'You are on the roster');
   };
 
+  openPr = (id) => {
+    const l = (this.state.lifts || []).filter(x => x.id === id)[0] || {};
+    const str = v => v != null ? String(v) : '';
+    this.setState(s => ({ prFrom: s.tab === 'lifts' ? 'lifts' : 'manage', tab: 'manage', sub: 'prs', err: '', prId: id, prSquat: str(l.squat), prBench: str(l.bench), prDead: str(l.deadlift) }));
+  };
+
+  savePr = async () => {
+    const s = this.state;
+    if (!s.prId) return this.setState({ err: 'Pick a lifter first.' });
+    const vals = {};
+    const fields = [['squat', s.prSquat], ['bench', s.prBench], ['deadlift', s.prDead]];
+    for (let i = 0; i < fields.length; i++) {
+      const t = String(fields[i][1]).trim();
+      if (!t) { vals[fields[i][0]] = null; continue; }
+      const n = Number(t);
+      if (!isFinite(n) || n <= 0 || n > 1000) return this.setState({ err: 'PRs need to be numbers in kg, above 0.' });
+      vals[fields[i][0]] = Math.round(n * 10) / 10;
+    }
+    const cleared = vals.squat == null && vals.bench == null && vals.deadlift == null;
+    const m = (s.roster || []).filter(x => x.id === s.prId)[0] || {};
+    const back = s.prFrom === 'lifts' ? { tab: 'lifts', sub: null } : { sub: null };
+    if (this.sb) {
+      const { error } = cleared
+        ? await this.sb.from('lifts').delete().eq('profile_id', s.prId)
+        : await this.sb.from('lifts').upsert(Object.assign({ profile_id: s.prId, updated_at: new Date().toISOString() }, vals));
+      if (error) return this.setState({ err: error.message });
+      this.loadLifts();
+    } else {
+      this.setState(st => {
+        const rest = (st.lifts || []).filter(l => l.id !== s.prId);
+        return { lifts: cleared ? rest : rest.concat([Object.assign({ id: s.prId, name: m.name, grade: m.grade, avatar_url: m.avatar_url || null }, vals)]) };
+      });
+    }
+    this.setState(Object.assign({ err: '' }, back));
+    this.say(cleared ? this.first(m.name) + ' removed from the leaderboard' : 'PRs saved for ' + this.first(m.name));
+  };
+
   setUserVisible = (v) => {
     this.setState(st => ({ user: Object.assign({}, st.user, { visible: v }) }));
     if (this.sb && this.state.user) this.sb.from('profiles').update({ visible: v }).eq('id', this.state.user.id).then(({ error }) => { if (error) this.say('Could not save.'); });
@@ -1146,10 +1258,29 @@ class Component extends DCLogic {
     const here = roster.filter(m => checkins[m.id] && m.visible);
     const hereHidden = Math.max(0, head - here.length);
 
+    const lifts = s.lifts || [];
+    const liftKey = { Squat: 'squat', Bench: 'bench', Deadlift: 'deadlift' }[s.liftFilter];
+    const scored = lifts.map(l => ({ l: l, v: Math.round((liftKey ? (l[liftKey] || 0) : (l.squat || 0) + (l.bench || 0) + (l.deadlift || 0)) * 10) / 10 }))
+      .filter(x => x.v > 0).sort((a, b) => b.v - a.v);
+    const liftRows = scored.map(x => {
+      const rank = 1 + scored.filter(y => y.v > x.v).length;
+      return {
+        rank: rank, name: x.l.name, initials: this.inits(x.l.name), avatarBg: this.bg(x.l.avatar_url), value: this.kg(x.v),
+        sub: liftKey ? (x.l.grade || '') : 'S ' + this.kg(x.l.squat) + ' · B ' + this.kg(x.l.bench) + ' · D ' + this.kg(x.l.deadlift),
+        rankColor: rank === 1 ? 'var(--red-500)' : 'var(--gray-400)',
+        border: x.l.id === u.id ? 'var(--red-700)' : 'var(--ink-700)',
+        cursor: isExec ? 'pointer' : 'default',
+        open: () => { if (isExec) this.openPr(x.l.id); }
+      };
+    });
+    const prLabel = m => m.name + ' — ' + m.email;
+    const prSel = roster.filter(m => m.id === s.prId)[0];
+
     const tabDefs = [
       { key: 'home', label: 'Now', icon: 'ph-bold ph-barbell' },
       { key: 'board', label: 'Board', icon: 'ph-bold ph-megaphone' },
       { key: 'schedule', label: 'Schedule', icon: 'ph-bold ph-calendar-blank' },
+      { key: 'lifts', label: 'Ranks', icon: 'ph-bold ph-trophy' },
       { key: 'profile', label: 'You', icon: 'ph-bold ph-user' }
     ];
     if (isExec) tabDefs.push({ key: 'manage', label: 'Manage', icon: 'ph-bold ph-sliders-horizontal' });
@@ -1205,7 +1336,13 @@ class Component extends DCLogic {
 
       tabHome: s.tab === 'home', tabBoard: s.tab === 'board',
       tabSchedule: s.tab === 'schedule' && s.sub !== 'event', atEvent: s.sub === 'event',
-      tabProfile: s.tab === 'profile', tabManage: s.tab === 'manage',
+      tabProfile: s.tab === 'profile', tabManage: s.tab === 'manage', tabLifts: s.tab === 'lifts',
+
+      liftFilters: ['Total', 'Squat', 'Bench', 'Deadlift'].map(f => ({
+        label: f, active: s.liftFilter === f, go: () => this.setState({ liftFilter: f })
+      })),
+      liftRows: liftRows, noLifts: liftRows.length === 0, liftLabel: s.liftFilter.toLowerCase(),
+      newPr: () => this.openPr(null),
 
       count: head, cap: cap, isExec: isExec, zoneColor: z.color, zoneLabel: z.label, zoneNote: z.note,
       fillPct: Math.round(pct), fillLabel: Math.round(pct) + '%', ringDeg: Math.round(pct * 3.6),
@@ -1214,7 +1351,7 @@ class Component extends DCLogic {
 
       showPresent: wantPresent && here.length > 0,
       hasNext: !!nx.name, hasTopPost: !!top.author,
-      present: here.map(m => ({ initials: this.inits(m.name), first: this.first(m.name) })),
+      present: here.map(m => ({ initials: this.inits(m.name), first: this.first(m.name), avatarBg: this.bg(m.avatar_url) })),
       hiddenNote: hereHidden > 0 ? '+' + hereHidden + ' private' : 'all opted in',
 
       nextTitle: nx.name || '', nextType: nx.kind || '', nextLoc: nx.loc || '',
@@ -1262,14 +1399,31 @@ class Component extends DCLogic {
       visibleNote: u.visible !== false ? 'Your first name shows on the Now screen while you are in the room.' : 'You still count toward the number — your name stays hidden.',
       signOut: this.signOut,
 
-      mgHome: !s.sub, mgCount: s.sub === 'count', mgPost: s.sub === 'post', mgEvent: s.sub === 'newEvent', mgMembers: s.sub === 'members',
+      mgHome: !s.sub, mgCount: s.sub === 'count', mgPost: s.sub === 'post', mgEvent: s.sub === 'newEvent', mgMembers: s.sub === 'members', mgPrs: s.sub === 'prs',
       mgBack: () => this.setState({ sub: null, err: '' }),
       mgTiles: [
         { icon: 'ph-bold ph-barbell', label: 'Check-in', meta: head + ' of ' + cap + ' · ' + z.label, go: () => this.setState({ sub: 'count', capDraft: String(cap) }) },
         { icon: 'ph-bold ph-megaphone', label: 'Post to board', meta: sortedPosts.length + ' posts', go: () => this.setState({ sub: 'post', editPostId: null, postText: '', postPin: false, postPush: true }) },
         { icon: 'ph-bold ph-calendar-plus', label: 'New event', meta: events.length + ' scheduled', go: () => this.setState({ sub: 'newEvent', err: '', editEventId: null, evName: '', evDate: '', evTime: '', evKind: 'Powerlifting', evLoc: 'Weight Room', evSpots: '20', evDesc: '' }) },
-        { icon: 'ph-bold ph-users-three', label: 'Members', meta: roster.length + ' registered', go: () => this.setState({ sub: 'members' }) }
+        { icon: 'ph-bold ph-users-three', label: 'Members', meta: roster.length + ' registered', go: () => this.setState({ sub: 'members' }) },
+        { icon: 'ph-bold ph-trophy', label: 'Leaderboard', meta: lifts.length + ' lifters ranked', go: () => this.openPr(null) }
       ],
+
+      prOptions: ['Choose a lifter'].concat(roster.map(prLabel)),
+      prPick: prSel ? prLabel(prSel) : 'Choose a lifter',
+      setPrPick: e => {
+        const m = roster.filter(x => prLabel(x) === e.target.value)[0];
+        const l = (m && lifts.filter(x => x.id === m.id)[0]) || {};
+        const str = v => v != null ? String(v) : '';
+        this.setState({ prId: m ? m.id : null, prSquat: str(l.squat), prBench: str(l.bench), prDead: str(l.deadlift), err: '' });
+      },
+      prSquat: s.prSquat, prBench: s.prBench, prDead: s.prDead,
+      setPrSquat: e => this.setState({ prSquat: e.target.value }),
+      setPrBench: e => this.setState({ prBench: e.target.value }),
+      setPrDead: e => this.setState({ prDead: e.target.value }),
+      savePr: this.savePr,
+      prBackLabel: s.prFrom === 'lifts' ? 'Leaderboard' : 'Manage',
+      prBack: () => this.setState(s.prFrom === 'lifts' ? { tab: 'lifts', sub: null, err: '' } : { sub: null, err: '' }),
       rsvpRows: sorted.map(e => ({ name: e.name, date: this.when(e.date) + ' · ' + this.t12(e.time), going: e.going, spots: e.spots })),
 
       guests: s.guests,
