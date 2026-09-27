@@ -36,6 +36,7 @@ a:hover{color:var(--white)}
 @keyframes wl-pulse{0%{box-shadow:0 0 0 0 rgba(226,27,60,.55)}70%{box-shadow:0 0 0 9px rgba(226,27,60,0)}100%{box-shadow:0 0 0 0 rgba(226,27,60,0)}}
 @keyframes wl-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @keyframes wl-drop{from{opacity:0;transform:translateY(-70px)}to{opacity:1;transform:none}}
+@keyframes wl-breathe{0%,100%{opacity:.55;transform:scale(.96)}50%{opacity:1;transform:scale(1)}}
 </style>
 </helmet>
 
@@ -43,6 +44,13 @@ a:hover{color:var(--white)}
 
 <sc-if value="{{ isAuth }}">
 <div style="height:100%;overflow-y:auto;padding:calc(env(safe-area-inset-top) + 32px) 24px calc(env(safe-area-inset-bottom) + 32px);display:flex;flex-direction:column">
+
+<sc-if value="{{ atLoading }}">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px">
+<img src="assets/wlmac-crest-t.png" alt="WLMAC Fitness Club crest" style="width:132px;height:132px;object-fit:contain;animation:wl-breathe 1.6s var(--ease-standard) infinite">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Loading</span>
+</div>
+</sc-if>
 
 <sc-if value="{{ atWelcome }}">
 <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;animation:wl-rise .3s var(--ease-standard)">
@@ -702,12 +710,14 @@ class Component extends DCLogic {
   SUPABASE_URL = 'https://olztucmomssaimcpcjxd.supabase.co';
   SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9senR1Y21vbXNzYWltY3BjanhkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUzODExNzgsImV4cCI6MjEwMDk1NzE3OH0.DPRgSg-clJFPy3R5aZmVBhBHCq0SBa3lwIpnXbHEmZM';
 
+  boot = this.bootState();
+
   state = {
-    route: 'welcome', step: 1, tab: 'home', sub: null, selId: null,
+    route: this.boot.route, step: 1, tab: 'home', sub: null, selId: null,
     email: '', pass: '', err: '',
     suName: '', suEmail: '', suGrade: 'Grade 9', suPass: '', suEcName: '', suEcPhone: '',
     suWaiver: false, suCoc: false, suVisible: true,
-    user: null,
+    user: this.boot.user,
     roster: null, checkins: {}, guests: 2, capacity: null, updatedAt: Date.now(),
     filter: 'All', rsvps: [],
     toast: null, push: null,
@@ -718,6 +728,23 @@ class Component extends DCLogic {
     lifts: null, liftFilter: 'Total', prId: null, prSquat: '', prBench: '', prDead: '', prFrom: 'manage',
     sbUrlDraft: '', sbKeyDraft: '',
   };
+
+  // Open straight into the app when this device has a saved session, instead of flashing the
+  // welcome screen while Supabase restores it. initSupabase() verifies it and corrects us if needed.
+  bootState() {
+    try {
+      const url = this.SUPABASE_URL || localStorage.getItem('wlmac.sbUrl');
+      if (!url || !localStorage.getItem('sb-' + new URL(url).hostname.split('.')[0] + '-auth-token')) return { route: 'welcome', user: null };
+      const cached = JSON.parse(localStorage.getItem('wlmac.user') || 'null');
+      return cached ? { route: 'app', user: cached } : { route: 'loading', user: null };
+    } catch (e) { return { route: 'welcome', user: null }; }
+  }
+  cacheUser(u) {
+    try { if (u) localStorage.setItem('wlmac.user', JSON.stringify(u)); else localStorage.removeItem('wlmac.user'); } catch (e) {}
+  }
+  bootFailed() {
+    if (this.state.route === 'app' || this.state.route === 'loading') { this.cacheUser(null); this.setState({ route: 'welcome', user: null }); }
+  }
 
   mockAccounts() {
     return [
@@ -758,22 +785,23 @@ class Component extends DCLogic {
 
   waitForSupabaseLib(tries, url, key) {
     if (window.supabase && window.supabase.createClient) return this.initSupabase(url, key);
-    if (tries > 50) { this.say('Could not load the Supabase library.'); return this.loadMock(); }
+    if (tries > 50) { this.say('Could not load the Supabase library.'); this.bootFailed(); return this.loadMock(); }
     setTimeout(() => this.waitForSupabaseLib(tries + 1, url, key), 100);
   }
 
   async initSupabase(url, key) {
     try { this.sb = window.supabase.createClient(url, key); }
-    catch (e) { this.say('Could not connect — check the URL and key.'); return this.loadMock(); }
+    catch (e) { this.say('Could not connect — check the URL and key.'); this.bootFailed(); return this.loadMock(); }
     this.forceUpdate();
     // Restore the session BEFORE any table reads — createClient() doesn't restore a
     // persisted session synchronously, so reads fired earlier go out unauthenticated
     // and get denied by RLS (403), even though a valid session exists moments later.
     const { data } = await this.sb.auth.getSession();
     if (data && data.session) await this.loadSessionUser(data.session.user.id);
+    else this.bootFailed();
     await Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom(), this.loadLifts()]);
     this.sb.auth.onAuthStateChange((event) => {
-      if (event === 'SIGNED_OUT') this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, rsvps: [] });
+      if (event === 'SIGNED_OUT') { this.cacheUser(null); this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, rsvps: [] }); }
     });
     this.sbChannel = this.sb.channel('wlmac-live')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'checkins' }, () => this.loadCheckins())
@@ -849,15 +877,19 @@ class Component extends DCLogic {
     const { error: dbErr } = await this.sb.from('profiles').update({ avatar_url: url }).eq('id', this.state.user.id);
     if (dbErr) return this.say('Photo uploaded but not saved: ' + dbErr.message);
     this.setState(s => ({ user: { ...s.user, avatar_url: url } }));
+    this.cacheUser({ ...this.state.user, avatar_url: url });
     this.say('Profile photo updated.');
   };
   async loadSessionUser(id) {
     const { data, error } = await this.sb.from('profiles').select('*').eq('id', id).single();
-    if (!error && data) { this.setState({ user: data, route: 'app', tab: 'home' }); this.loadMyRsvps(id); this.loadLifts(); return; }
+    // Keep the current tab if we opened straight into the app from the cached profile.
+    const enter = u => { this.cacheUser(u); this.setState(s => ({ user: u, route: 'app', tab: s.route === 'app' ? s.tab : 'home' })); };
+    if (!error && data) { enter(data); this.loadMyRsvps(id); this.loadLifts(); return; }
     if (error && error.code !== 'PGRST116') {
       // Real error (RLS denial, network, etc) — surface it instead of silently
       // falling back to a hardcoded 'member' role, which would mask exec accounts.
       this.say('Could not load your profile: ' + error.message);
+      if (this.state.route === 'loading') this.setState({ route: 'welcome' });
       return;
     }
     // No profile row yet (e.g. account created before the row-creation trigger ran, or trigger
@@ -870,7 +902,7 @@ class Component extends DCLogic {
     await this.sb.from('profiles').upsert(fallbackUser, { onConflict: 'id', ignoreDuplicates: true });
     const retry = await this.sb.from('profiles').select('*').eq('id', id).single();
     const finalUser = (!retry.error && retry.data) ? retry.data : fallbackUser;
-    this.setState({ route: 'app', tab: 'home', user: finalUser });
+    enter(finalUser);
     this.loadMyRsvps(id);
     this.loadLifts();
   }
@@ -1205,11 +1237,13 @@ class Component extends DCLogic {
 
   setUserVisible = (v) => {
     this.setState(st => ({ user: Object.assign({}, st.user, { visible: v }) }));
+    if (this.sb) this.cacheUser(Object.assign({}, this.state.user, { visible: v }));
     if (this.sb && this.state.user) this.sb.from('profiles').update({ visible: v }).eq('id', this.state.user.id).then(({ error }) => { if (error) this.say('Could not save.'); });
   };
 
   signOut = () => {
     if (this.sb) this.sb.auth.signOut();
+    this.cacheUser(null);
     this.setState({ user: null, route: 'welcome', tab: 'home', sub: null, email: '', pass: '', rsvps: [] });
   };
 
@@ -1300,7 +1334,7 @@ class Component extends DCLogic {
 
     return {
       isAuth: s.route !== 'app', isApp: s.route === 'app',
-      atWelcome: s.route === 'welcome', atLogin: s.route === 'login', atSignup: s.route === 'signup',
+      atLoading: s.route === 'loading', atWelcome: s.route === 'welcome', atLogin: s.route === 'login', atSignup: s.route === 'signup',
       goWelcome: () => this.setState({ route: 'welcome', err: '' }),
       goLogin: () => this.setState({ route: 'login', err: '' }),
       goSignup: () => this.setState({ route: 'signup', step: 1, err: '' }),
