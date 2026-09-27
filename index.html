@@ -169,6 +169,18 @@ a:hover{color:var(--white)}
 <sc-if value="{{ tabHome }}" hint-placeholder-val="{{ true }}">
 <div style="display:flex;flex-direction:column;gap:26px;animation:wl-rise .28s var(--ease-standard)">
 
+<sc-if value="{{ gymClosed }}">
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:18px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Weight room</span>
+<span style="display:inline-flex;align-items:center;gap:6px;font-family:var(--font-heading);font-weight:700;font-size:10.5px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)"><i class="ph-bold ph-lock-simple" style="font-size:12px"></i>Closed</span>
+</div>
+<div style="font-family:var(--font-display);font-size:64px;line-height:.9;text-transform:uppercase;color:var(--gray-400);margin:14px 0 12px">Gym<br>closed</div>
+<p style="margin:0;font-size:14px;line-height:1.5;color:var(--text-secondary)">No open session right now. The live count comes back when an exec opens the room.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{ gymOpen }}" hint-placeholder-val="{{ true }}">
 <div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);box-shadow:var(--shadow-md);padding:18px 18px 16px">
 <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
 <span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">In the weight room</span>
@@ -217,7 +229,11 @@ a:hover{color:var(--white)}
 <span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;padding:5px 12px;border-radius:var(--radius-pill);border:1px solid {{ zoneColor }};color:{{ zoneColor }}">{{ zoneLabel }}</span>
 <span style="font-size:12px;color:var(--gray-500);font-variant-numeric:tabular-nums">{{ stamp }}</span>
 </div>
+<div style="display:grid;margin-top:14px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Button" size="lg" variant="{{ selfVariant }}" onClick="{{ toggleSelf }}" hint-size="100%,54px">{{ selfLabel }}</x-import>
 </div>
+</div>
+</sc-if>
 
 <sc-if value="{{ showPresent }}">
 <div>
@@ -529,8 +545,19 @@ a:hover{color:var(--white)}
 <div>
 <button onClick="{{ mgBack }}" style="background:none;border:none;padding:0;margin-bottom:18px;display:flex;align-items:center;gap:6px;cursor:pointer;color:var(--gray-400);font-family:var(--font-heading);font-weight:700;font-size:12px;letter-spacing:var(--tracking-wider);text-transform:uppercase"><i class="ph-bold ph-caret-left" style="font-size:15px"></i>Manage</button>
 <div style="font-family:var(--font-display);font-size:32px;line-height:1;text-transform:uppercase;color:var(--white)">Check-in</div>
-<p style="margin:8px 0 18px;font-size:14.5px;color:var(--text-secondary)">Tap a lifter in when they walk into the room, out when they leave. The live count is whoever is checked in.</p>
+<p style="margin:8px 0 18px;font-size:14.5px;color:var(--text-secondary)">Open the gym to start the live count. Members check themselves in from their app, and you can check anyone in or out here.</p>
 
+<div style="background:var(--surface-card);border:1px solid {{ openBorder }};border-radius:var(--radius-md);padding:16px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px">
+<x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Switch" label="Gym is open" checked="{{ isOpen }}" onChange="{{ setGymOpen }}" hint-size="100%,22px"></x-import>
+<p style="margin:0;font-size:13px;line-height:1.5;color:var(--text-tertiary)">{{ openNote }}</p>
+</div>
+
+<sc-if value="{{ gymClosed }}">
+<div style="background:var(--surface-card);border:1px dashed var(--ink-600);border-radius:var(--radius-md);padding:18px;margin-bottom:20px;text-align:center;font-size:14px;line-height:1.5;color:var(--gray-400)">The gym is closed. Everyone sees <b style="color:var(--white)">GYM CLOSED</b> on the home screen and nobody can check in.</div>
+</sc-if>
+
+<sc-if value="{{ gymOpen }}">
+<div>
 <div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;margin-bottom:16px">
 <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px">
 <div style="display:flex;align-items:baseline;gap:8px">
@@ -574,6 +601,8 @@ a:hover{color:var(--white)}
 </button>
 </sc-for>
 </div>
+</div>
+</sc-if>
 <div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:16px;display:flex;flex-direction:column;gap:14px">
 <span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Room capacity</span>
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Max lifters" type="number" value="{{ capDraft }}" onChange="{{ setCapDraft }}" helper="Sets the ceiling the gauge fills against." hint-size="100%,92px"></x-import>
@@ -718,7 +747,7 @@ class Component extends DCLogic {
     suName: '', suEmail: '', suGrade: 'Grade 9', suPass: '', suEcName: '', suEcPhone: '',
     suWaiver: false, suCoc: false, suVisible: true,
     user: this.boot.user,
-    roster: null, checkins: {}, guests: 2, capacity: null, updatedAt: Date.now(),
+    roster: null, checkins: {}, guests: 2, capacity: null, isOpen: null, updatedAt: Date.now(),
     filter: 'All', rsvps: [],
     toast: null, push: null,
     capDraft: null, editPostId: null, editEventId: null,
@@ -817,7 +846,7 @@ class Component extends DCLogic {
     const roster = this.mockRoster();
     const checkins = {};
     roster.forEach(m => { checkins[m.id] = !!m.here; });
-    this.setState({ roster: roster, checkins: checkins, guests: 2, events: this.seedEvents(), posts: this.seedPosts(), lifts: this.seedLifts() });
+    this.setState({ roster: roster, checkins: checkins, guests: 2, isOpen: true, events: this.seedEvents(), posts: this.seedPosts(), lifts: this.seedLifts() });
     const start = this.props.startSignedInAs;
     if (start === 'Member') this.setState({ user: this.mockAccounts()[2], route: 'app' });
     if (start === 'Exec') this.setState({ user: this.mockAccounts()[0], route: 'app' });
@@ -854,7 +883,8 @@ class Component extends DCLogic {
   }
   async loadRoom() {
     const { data, error } = await this.sb.from('room_state').select('*').eq('id', 1).single();
-    if (!error && data) this.setState({ guests: data.guests, capacity: data.capacity, updatedAt: Date.now() });
+    // is_open missing (column not added yet) counts as open, so the app behaves as before.
+    if (!error && data) this.setState({ guests: data.guests, capacity: data.capacity, isOpen: data.is_open !== false, updatedAt: Date.now() });
   }
   async loadLifts() {
     const { data, error } = await this.sb.from('lifts').select('profile_id, squat, bench, deadlift, profiles(name, grade, avatar_url)');
@@ -1067,6 +1097,37 @@ class Component extends DCLogic {
     }
     this.setState({ checkins: {}, guests: 0, updatedAt: Date.now() });
     this.say('Room cleared — count is 0');
+  };
+
+  // Members check themselves in/out. Checking in needs the gym open (the database enforces
+  // this too); checking out always works.
+  toggleSelf = async () => {
+    const u = this.state.user;
+    if (!u) return;
+    const cur = !!this.state.checkins[u.id];
+    if (!cur && this.state.isOpen === false) return this.say('The gym is closed right now.');
+    if (this.sb) {
+      const { data, error } = await this.sb.from('checkins').update({ checked_in: !cur, updated_at: new Date().toISOString() }).eq('profile_id', u.id).select('profile_id');
+      // RLS blocks silently (0 rows, no error), so check that the row actually changed.
+      if (error || !data || !data.length) return this.say(cur ? 'Could not check you out — try again.' : 'Could not check you in — try again.');
+    }
+    this.setState(s => ({ checkins: Object.assign({}, s.checkins, { [u.id]: !cur }), updatedAt: Date.now() }));
+    this.say(cur ? 'Checked out. See you next time.' : 'You are checked in.');
+  };
+
+  // Closing the gym checks everyone out and zeroes drop-ins so the next session starts clean.
+  setGymOpen = async (open) => {
+    const now = new Date().toISOString();
+    if (this.sb) {
+      const { error } = await this.sb.from('room_state').update(open ? { is_open: true, updated_at: now } : { is_open: false, guests: 0, updated_at: now }).eq('id', 1);
+      if (error) return this.say('Could not update: ' + error.message);
+      if (!open) {
+        const { error: outErr } = await this.sb.from('checkins').update({ checked_in: false, updated_at: now }).eq('checked_in', true);
+        if (outErr) this.say('Gym closed, but could not check everyone out.');
+      }
+    }
+    this.setState(s => open ? { isOpen: true, updatedAt: Date.now() } : { isOpen: false, guests: 0, checkins: {}, updatedAt: Date.now() });
+    this.say(open ? 'Gym is open — live count is on' : 'Gym closed — everyone checked out');
   };
 
   saveCap = async () => {
@@ -1387,7 +1448,13 @@ class Component extends DCLogic {
       plates: plates, stamp: 'Updated ' + this.ago(s.updatedAt),
       gPlates: gauge === 'Plate rack', gBar: gauge === 'Capacity bar', gRing: gauge === 'Crest ring',
 
-      showPresent: wantPresent && here.length > 0,
+      gymOpen: s.isOpen !== false, gymClosed: s.isOpen === false, isOpen: s.isOpen !== false,
+      setGymOpen: this.setGymOpen, toggleSelf: this.toggleSelf,
+      selfLabel: checkins[u.id] ? 'You’re in — tap when you leave' : 'I’m at the gym',
+      selfVariant: checkins[u.id] ? 'secondary' : 'primary',
+      openBorder: s.isOpen === false ? 'var(--ink-700)' : 'var(--red-700)',
+      openNote: s.isOpen === false ? 'Closed. Turn this on when the room opens so the live count shows and members can check in.' : 'Open. Turning this off checks everyone out and shows GYM CLOSED on the home screen.',
+      showPresent: wantPresent && here.length > 0 && s.isOpen !== false,
       hasNext: !!nx.name, hasTopPost: !!top.author,
       present: here.map(m => ({ initials: this.inits(m.name), first: this.first(m.name), avatarBg: this.bg(m.avatar_url) })),
       hiddenNote: hereHidden > 0 ? '+' + hereHidden + ' private' : 'all opted in',
@@ -1440,7 +1507,7 @@ class Component extends DCLogic {
       mgHome: !s.sub, mgCount: s.sub === 'count', mgPost: s.sub === 'post', mgEvent: s.sub === 'newEvent', mgMembers: s.sub === 'members', mgPrs: s.sub === 'prs',
       mgBack: () => this.setState({ sub: null, err: '' }),
       mgTiles: [
-        { icon: 'ph-bold ph-barbell', label: 'Check-in', meta: head + ' of ' + cap + ' · ' + z.label, go: () => this.setState({ sub: 'count', capDraft: String(cap) }) },
+        { icon: 'ph-bold ph-barbell', label: 'Check-in', meta: s.isOpen === false ? 'Gym closed' : head + ' of ' + cap + ' · ' + z.label, go: () => this.setState({ sub: 'count', capDraft: String(cap) }) },
         { icon: 'ph-bold ph-megaphone', label: 'Post to board', meta: sortedPosts.length + ' posts', go: () => this.setState({ sub: 'post', editPostId: null, postText: '', postPin: false, postPush: true }) },
         { icon: 'ph-bold ph-calendar-plus', label: 'New event', meta: events.length + ' scheduled', go: () => this.setState({ sub: 'newEvent', err: '', editEventId: null, evName: '', evDate: '', evTime: '', evKind: 'Powerlifting', evLoc: 'Weight Room', evSpots: '20', evDesc: '' }) },
         { icon: 'ph-bold ph-users-three', label: 'Members', meta: roster.length + ' registered', go: () => this.setState({ sub: 'members' }) },

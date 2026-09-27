@@ -208,3 +208,15 @@ grant select, insert, update, delete on public.lifts to authenticated;
 create policy "lifts_select_all" on public.lifts for select using (auth.role() = 'authenticated');
 create policy "lifts_write_exec" on public.lifts for all using (public.is_exec()) with check (public.is_exec());
 alter publication supabase_realtime add table public.lifts;
+
+-- ---------- open/closed gym + member self check-in ----------
+-- Already ran the file above? Run just this section in the SQL Editor.
+-- Execs open/close the gym (room_state is exec-write only). Members can flip their own
+-- check-in row — checking in only while the gym is open, checking out any time.
+alter table public.room_state add column if not exists is_open boolean not null default false;
+create policy "checkins_update_self" on public.checkins for update
+  using (auth.uid() = profile_id)
+  with check (
+    auth.uid() = profile_id
+    and (checked_in = false or exists (select 1 from public.room_state where id = 1 and is_open))
+  );
