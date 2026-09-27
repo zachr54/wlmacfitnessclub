@@ -192,6 +192,9 @@ create table if not exists public.lifts (
   updated_at timestamptz not null default now()
 );
 alter table public.lifts enable row level security;
+-- Newer Supabase projects don't auto-grant table access to logged-in users; without this,
+-- saving PRs fails with "permission denied for table lifts". RLS below still limits writes to execs.
+grant select, insert, update, delete on public.lifts to authenticated;
 create policy "lifts_select_all" on public.lifts for select using (auth.role() = 'authenticated');
 create policy "lifts_write_exec" on public.lifts for all using (public.is_exec()) with check (public.is_exec());
 alter publication supabase_realtime add table public.lifts;
