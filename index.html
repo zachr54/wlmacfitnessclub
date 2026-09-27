@@ -24,7 +24,11 @@
 <script src="_ds/wlmac-fitness-club-design-system-a70098a1-12ef-4b56-a144-fefc01dd79d1/_ds_bundle.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
-body{margin:0;background:#060606;color:var(--white);font-family:var(--font-body)}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:#060606;color:var(--white);font-family:var(--font-body);overflow-x:hidden}
+input,select,textarea{min-width:0;max-width:100%}
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-height:46px;text-align:left}
 a{color:var(--red-500);text-decoration:none}
 a:hover{color:var(--white)}
 ::-webkit-scrollbar{width:0;height:0}
@@ -325,7 +329,7 @@ a:hover{color:var(--white)}
 </div>
 <div style="display:flex;flex-direction:column;gap:10px">
 <sc-for list="{{ events }}" as="e" hint-placeholder-count="4">
-<button onClick="{{ e.open }}" style="width:100%;text-align:left;display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:14px;cursor:pointer">
+<button onClick="{{ e.open }}" style="width:100%;text-align:left;display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:14px;cursor:pointer">
 <span style="display:flex;flex-direction:column;align-items:center;gap:1px;border-right:1px solid var(--ink-700);padding-right:12px">
 <span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--red-500)">{{ e.mon }}</span>
 <span style="font-family:var(--font-display);font-size:28px;line-height:1;color:var(--white);font-variant-numeric:tabular-nums">{{ e.day }}</span>
@@ -402,7 +406,7 @@ a:hover{color:var(--white)}
 </sc-if>
 <div style="display:flex;flex-direction:column;gap:8px">
 <sc-for list="{{ liftRows }}" as="r" hint-placeholder-count="6">
-<button onClick="{{ r.open }}" style="width:100%;text-align:left;display:grid;grid-template-columns:28px 34px 1fr auto;gap:12px;align-items:center;background:var(--surface-card);border:1px solid {{ r.border }};border-radius:var(--radius-md);padding:11px 14px;cursor:{{ r.cursor }}">
+<button onClick="{{ r.open }}" style="width:100%;text-align:left;display:grid;grid-template-columns:28px 34px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--surface-card);border:1px solid {{ r.border }};border-radius:var(--radius-md);padding:11px 14px;cursor:{{ r.cursor }}">
 <span style="font-family:var(--font-display);font-size:22px;line-height:1;text-align:center;font-variant-numeric:tabular-nums;color:{{ r.rankColor }}">{{ r.rank }}</span>
 <span style="width:34px;height:34px;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--white);overflow:hidden;position:relative">
 <span style="position:relative;z-index:0">{{ r.initials }}</span>
@@ -439,7 +443,7 @@ a:hover{color:var(--white)}
 <span style="font-size:13.5px;color:var(--gray-400)">{{ userEmail }}</span>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:16px">
 <div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:14px">
 <div style="font-family:var(--font-display);font-size:34px;line-height:1;color:var(--white)">{{ statSessions }}</div>
 <div style="font-family:var(--font-heading);font-weight:700;font-size:10.5px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500);margin-top:4px">Sessions this month</div>
@@ -485,7 +489,7 @@ a:hover{color:var(--white)}
 </div>
 
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:24px">
 <sc-for list="{{ mgTiles }}" as="t" hint-placeholder-count="4">
 <button onClick="{{ t.go }}" style="text-align:left;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:15px;cursor:pointer;display:flex;flex-direction:column;gap:10px;min-height:112px">
 <i class="{{ t.icon }}" style="font-size:22px;color:var(--red-500)"></i>
@@ -551,7 +555,7 @@ a:hover{color:var(--white)}
 <span style="display:block;font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500);margin-bottom:11px">Roster</span>
 <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:26px">
 <sc-for list="{{ roomList }}" as="m" hint-placeholder-count="6">
-<button onClick="{{ m.toggle }}" style="width:100%;text-align:left;display:grid;grid-template-columns:22px 32px 1fr auto;gap:12px;align-items:center;background:{{ m.bg }};border:1px solid {{ m.border }};border-radius:var(--radius-md);padding:11px 13px;cursor:pointer;transition:background .16s var(--ease-standard),border-color .16s var(--ease-standard)">
+<button onClick="{{ m.toggle }}" style="width:100%;text-align:left;display:grid;grid-template-columns:22px 32px minmax(0,1fr) auto;gap:12px;align-items:center;background:{{ m.bg }};border:1px solid {{ m.border }};border-radius:var(--radius-md);padding:11px 13px;cursor:pointer;transition:background .16s var(--ease-standard),border-color .16s var(--ease-standard)">
 <span style="width:22px;height:22px;border:2px solid {{ m.boxBorder }};border-radius:var(--radius-sm);background:{{ m.boxBg }};display:flex;align-items:center;justify-content:center;color:var(--white)"><sc-if value="{{ m.in }}"><i class="ph-bold ph-check" style="font-size:12px"></i></sc-if></span>
 <span style="width:32px;height:32px;border-radius:50%;background:var(--ink-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:11.5px;color:var(--gray-200)">{{ m.initials }}</span>
 <span style="display:flex;flex-direction:column;gap:1px;min-width:0">
@@ -597,12 +601,12 @@ a:hover{color:var(--white)}
 <p style="margin:8px 0 22px;font-size:14.5px;color:var(--text-secondary)">{{ evSub }}</p>
 <div style="display:grid;gap:16px">
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Name" placeholder="Fall Deadlift Meet" value="{{ evName }}" onChange="{{ setEvName }}" hint-size="100%,72px"></x-import>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px">
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Date" type="date" value="{{ evDate }}" onChange="{{ setEvDate }}" hint-size="100%,72px"></x-import>
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Time" type="time" value="{{ evTime }}" onChange="{{ setEvTime }}" hint-size="100%,72px"></x-import>
 </div>
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Select" label="Type" options="{{ kinds }}" value="{{ evKind }}" onChange="{{ setEvKind }}" hint-size="100%,72px"></x-import>
-<div style="display:grid;grid-template-columns:1fr 96px;gap:12px">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:12px">
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Where" placeholder="Weight Room" value="{{ evLoc }}" onChange="{{ setEvLoc }}" hint-size="100%,72px"></x-import>
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Spots" type="number" value="{{ evSpots }}" onChange="{{ setEvSpots }}" hint-size="100%,72px"></x-import>
 </div>
@@ -623,7 +627,7 @@ a:hover{color:var(--white)}
 <p style="margin:8px 0 20px;font-size:14.5px;color:var(--text-secondary)">{{ memberCountLine }}</p>
 <div style="display:flex;flex-direction:column;gap:8px">
 <sc-for list="{{ members }}" as="m" hint-placeholder-count="6">
-<div style="display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:12px 14px">
+<div style="display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:center;background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:12px 14px">
 <span style="width:34px;height:34px;border-radius:50%;background:var(--red-800);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--white)">{{ m.initials }}</span>
 <span style="display:flex;flex-direction:column;gap:2px;min-width:0">
 <span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white)">{{ m.name }}</span>
@@ -646,7 +650,7 @@ a:hover{color:var(--white)}
 <p style="margin:8px 0 22px;font-size:14.5px;color:var(--text-secondary)">Pick a lifter and enter their best squat, bench and deadlift in kg. Leave a lift blank to take it off the board.</p>
 <div style="display:grid;gap:16px">
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Select" label="Lifter" options="{{ prOptions }}" value="{{ prPick }}" onChange="{{ setPrPick }}" hint-size="100%,72px"></x-import>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:10px">
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Squat" type="number" placeholder="kg" value="{{ prSquat }}" onChange="{{ setPrSquat }}" hint-size="100%,72px"></x-import>
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Bench" type="number" placeholder="kg" value="{{ prBench }}" onChange="{{ setPrBench }}" hint-size="100%,72px"></x-import>
 <x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Input" label="Deadlift" type="number" placeholder="kg" value="{{ prDead }}" onChange="{{ setPrDead }}" hint-size="100%,72px"></x-import>
@@ -664,10 +668,10 @@ a:hover{color:var(--white)}
 
 <div style="flex:none;display:flex;border-top:1px solid var(--ink-700);background:var(--black)">
 <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="4">
-<button onClick="{{ t.go }}" style="flex:1;position:relative;background:none;border:none;padding:11px 0 calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ t.color }}">
+<button onClick="{{ t.go }}" style="flex:1;min-width:0;position:relative;background:none;border:none;padding:11px 0 calc(env(safe-area-inset-bottom) + 14px);display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;color:{{ t.color }}">
 <sc-if value="{{ t.active }}"><span style="position:absolute;top:0;width:30px;height:3px;background:var(--red-600)"></span></sc-if>
 <i class="{{ t.icon }}" style="font-size:22px"></i>
-<span style="font-family:var(--font-heading);font-weight:700;font-size:10px;letter-spacing:var(--tracking-wider);text-transform:uppercase">{{ t.label }}</span>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:10px;letter-spacing:var(--tracking-wide);text-transform:uppercase;white-space:nowrap">{{ t.label }}</span>
 <sc-if value="{{ t.dot }}"><span style="position:absolute;top:9px;margin-left:17px;width:7px;height:7px;border-radius:50%;background:var(--red-500)"></span></sc-if>
 </button>
 </sc-for>
