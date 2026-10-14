@@ -412,11 +412,30 @@ a:hover{color:var(--white)}
 <span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Going</span>
 <span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">{{ selGoingLabel }}</span>
 </div>
+<sc-if value="{{ showGoingBubbles }}">
 <div style="display:flex;flex-wrap:wrap;gap:7px">
 <sc-for list="{{ selGoing }}" as="g" hint-placeholder-count="6">
 <span style="width:34px;height:34px;border-radius:50%;background:var(--ink-800);border:1px solid var(--ink-600);display:flex;align-items:center;justify-content:center;font-family:var(--font-heading);font-weight:700;font-size:12px;color:var(--gray-200)">{{ g.initials }}</span>
 </sc-for>
 </div>
+</sc-if>
+<sc-if value="{{ isExec }}">
+<div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:4px 16px">
+<sc-for list="{{ selSignups }}" as="p" hint-placeholder-count="4">
+<div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--ink-800)">
+<span style="width:26px;font-family:var(--font-heading);font-weight:700;font-size:13px;color:var(--gray-500);font-variant-numeric:tabular-nums">{{ p.n }}</span>
+<span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+<span style="font-size:14.5px;font-weight:600;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ p.name }}</span>
+<span style="font-size:11.5px;color:var(--gray-500)">{{ p.meta }}</span>
+</span>
+<span style="font-family:var(--font-heading);font-weight:700;font-size:10px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--red-500)">{{ p.tag }}</span>
+</div>
+</sc-for>
+<sc-if value="{{ selNoSignups }}">
+<p style="margin:0;padding:14px 0;font-size:14px;color:var(--gray-500)">No one has signed up yet.</p>
+</sc-if>
+</div>
+</sc-if>
 </div>
 </sc-if>
 
@@ -534,17 +553,19 @@ a:hover{color:var(--white)}
 
 <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
 <span style="font-family:var(--font-heading);font-weight:700;font-size:11px;letter-spacing:var(--tracking-widest);text-transform:uppercase;color:var(--gray-500)">Sign-ups by event</span>
+<span style="font-size:11.5px;color:var(--gray-500)">Tap one to see who</span>
 </div>
 <div style="background:var(--surface-card);border:1px solid var(--ink-700);border-radius:var(--radius-md);padding:4px 16px">
 <sc-for list="{{ rsvpRows }}" as="r" hint-placeholder-count="4">
-<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--ink-800)">
+<button onClick="{{ r.open }}" style="width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--ink-800);cursor:pointer;display:flex;align-items:center;gap:12px;padding:13px 0">
 <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
 <span style="font-family:var(--font-heading);font-weight:700;font-size:14px;letter-spacing:var(--tracking-wide);text-transform:uppercase;color:var(--white);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ r.name }}</span>
 <span style="font-size:11.5px;color:var(--gray-500)">{{ r.date }}</span>
 </span>
 <span style="font-family:var(--font-display);font-size:22px;color:var(--white);font-variant-numeric:tabular-nums">{{ r.going }}</span>
 <span style="font-family:var(--font-heading);font-weight:600;font-size:11px;letter-spacing:var(--tracking-wider);text-transform:uppercase;color:var(--gray-500)">/ {{ r.spots }}</span>
-</div>
+<i class="ph-bold ph-caret-right" style="font-size:15px;color:var(--gray-500)"></i>
+</button>
 </sc-for>
 </div>
 </div>
@@ -762,7 +783,7 @@ class Component extends DCLogic {
     capDraft: null, editPostId: null, editEventId: null,
     evName: '', evDate: '', evTime: '', evKind: 'Powerlifting', evLoc: 'Weight Room', evSpots: '20', evDesc: '',
     postText: '', postPin: false, postPush: true,
-    events: null, posts: null, tick: 0,
+    events: null, posts: null, signups: {}, tick: 0,
     lifts: null, liftFilter: 'Total', prId: null, prSquat: '', prBench: '', prDead: '', prFrom: 'manage',
     sbUrlDraft: '', sbKeyDraft: '',
   };
@@ -848,6 +869,7 @@ class Component extends DCLogic {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => this.loadPosts())
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => { this.loadRoster(); this.loadLifts(); })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'lifts' }, () => this.loadLifts())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'rsvps' }, () => this.loadSignups())
       .subscribe();
   }
 
@@ -900,6 +922,17 @@ class Component extends DCLogic {
     const num = v => v != null ? Number(v) : null;
     if (!error) this.setState({ lifts: data.filter(l => l.profiles).map(l => ({ id: l.profile_id, name: l.profiles.name, grade: l.profiles.grade, avatar_url: l.profiles.avatar_url, squat: num(l.squat), bench: num(l.bench), deadlift: num(l.deadlift) })) });
   }
+  // Everyone signed up for each event, oldest first: { eventId: [{ id, name, grade, visible, at }] }.
+  async loadSignups() {
+    const { data, error } = await this.sb.from('rsvps').select('event_id, profile_id, created_at, profiles(name, grade, visible)').order('created_at');
+    if (error) return;
+    const map = {};
+    data.forEach(r => {
+      const p = r.profiles || {};
+      (map[r.event_id] = map[r.event_id] || []).push({ id: r.profile_id, name: p.name || 'Member', grade: p.grade || '', visible: p.visible !== false, at: r.created_at });
+    });
+    this.setState({ signups: map });
+  }
   async loadMyRsvps(profileId) {
     const { data, error } = await this.sb.from('rsvps').select('event_id').eq('profile_id', profileId);
     if (!error) this.setState({ rsvps: data.map(r => r.event_id) });
@@ -920,7 +953,7 @@ class Component extends DCLogic {
     this.say('Profile photo updated.');
   };
   loadClubData() {
-    return Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom(), this.loadLifts()]);
+    return Promise.all([this.loadRoster(), this.loadEvents(), this.loadPosts(), this.loadCheckins(), this.loadRoom(), this.loadLifts(), this.loadSignups()]);
   }
   async loadSessionUser(id) {
     // Fetch club data alongside the profile rather than after it, so the count shows sooner.
@@ -1262,6 +1295,7 @@ class Component extends DCLogic {
       if (on) { const { error } = await this.sb.from('rsvps').delete().eq('event_id', id).eq('profile_id', uid); if (error) return this.say('Could not update.'); }
       else { const { error } = await this.sb.from('rsvps').insert({ event_id: id, profile_id: uid }); if (error) return this.say('Could not update.'); }
       this.setState(s => ({ rsvps: on ? s.rsvps.filter(x => x !== id) : s.rsvps.concat([id]) }));
+      this.loadSignups();
       this.say(on ? 'Spot released' : 'You are on the roster');
       return;
     }
@@ -1360,8 +1394,16 @@ class Component extends DCLogic {
     const selLeft = Math.max(0, (sel.spots || 0) - (sel.going || 0));
     const rsvped = s.rsvps.indexOf(s.selId) > -1;
     const selDate = sel.date ? new Date(sel.date + 'T00:00:00') : null;
-    const going = [];
-    for (let i = 0; i < Math.min(8, sel.going || 0) && roster.length; i++) going.push({ initials: this.inits(roster[i % roster.length].name) });
+    // Demo mode has no sign-up records, so it fills the list from the sample roster.
+    const signups = this.sb ? (s.signups[s.selId] || []) : roster.filter(m => m.id !== u.id)
+      .slice(0, Math.max(0, (sel.going || 0) - (rsvped ? 1 : 0))).map(m => ({ id: m.id, name: m.name, grade: m.grade, visible: m.visible }))
+      .concat(rsvped ? [{ id: u.id, name: u.name, grade: u.grade, visible: true }] : []);
+    const going = signups.filter(p => p.visible || p.id === u.id).slice(0, 8).map(p => ({ initials: this.inits(p.name) }));
+    const signupRows = signups.map((p, i) => ({
+      n: i + 1, name: p.name,
+      meta: [p.grade, p.at ? 'Signed up ' + new Date(p.at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : ''].filter(Boolean).join(' · '),
+      tag: i >= (sel.spots || 0) ? 'Waitlist' : ''
+    }));
 
     const sortedPosts = posts.slice().sort((a, b) => (a.pinned === b.pinned ? b.at - a.at : (a.pinned ? -1 : 1)));
     const top = sortedPosts[0] || {};
@@ -1508,6 +1550,7 @@ class Component extends DCLogic {
       rsvpVariant: rsvped ? 'secondary' : 'primary',
       toggleRsvp: this.toggleRsvp,
       selGoing: going, selGoingLabel: (sel.going || 0) + ' of ' + (sel.spots || 0),
+      showGoingBubbles: !isExec, selSignups: signupRows, selNoSignups: !signupRows.length,
       editSel: () => this.editEvent(sel), deleteSel: () => this.deleteEvent(sel.id),
 
       userName: u.name || '', userGrade: u.grade || '', userEmail: u.email || '', userEc: ec || '—',
@@ -1543,7 +1586,7 @@ class Component extends DCLogic {
       savePr: this.savePr,
       prBackLabel: s.prFrom === 'lifts' ? 'Leaderboard' : 'Manage',
       prBack: () => this.setState(s.prFrom === 'lifts' ? { tab: 'lifts', sub: null, err: '' } : { sub: null, err: '' }),
-      rsvpRows: sorted.map(e => ({ name: e.name, date: this.when(e.date) + ' · ' + this.t12(e.time), going: e.going, spots: e.spots })),
+      rsvpRows: sorted.map(e => ({ name: e.name, date: this.when(e.date) + ' · ' + this.t12(e.time), going: e.going, spots: e.spots, open: () => this.setState({ tab: 'schedule', sub: 'event', selId: e.id }) })),
 
       guests: s.guests,
       incGuest: () => this.bumpGuests(1), decGuest: () => this.bumpGuests(-1), clearRoom: this.clearRoom,
