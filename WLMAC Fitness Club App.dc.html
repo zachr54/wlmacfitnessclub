@@ -308,7 +308,7 @@ a:hover{color:var(--white)}
 <sc-if value="{{ tabSchedule }}">
 <div style="animation:wl-rise .28s var(--ease-standard)">
 <div style="font-family:var(--font-display);font-size:38px;line-height:1;text-transform:uppercase;color:var(--white)">Schedule</div>
-<p style="margin:8px 0 18px;font-size:14.5px;color:var(--text-secondary)">Meets, open lifts and guest speakers.</p>
+<p style="margin:8px 0 18px;font-size:14.5px;color:var(--text-secondary)">Meets, open lifts, guest speakers and info sessions.</p>
 <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:16px">
 <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
 <span style="flex:none"><x-import component-from-global-scope="WLMACFitnessClubDesignSystem_a70098.Tag" active="{{ f.active }}" onClick="{{ f.go }}" hint-size="auto,32px">{{ f.label }}</x-import></span>
@@ -790,7 +790,7 @@ class Component extends DCLogic {
     return [
       { id: 1, name: 'Open Lift Thursday', kind: 'Open Lift', date: this.iso(2), time: '14:45', loc: 'Weight Room', spots: 20, going: 11, desc: 'Racks free for anyone. Spotters on hand, no sign-up needed if there is room. Bring your own straps if you have them — we have the rest.' },
       { id: 2, name: 'Fall Deadlift Meet', kind: 'Powerlifting', date: this.iso(6), time: '15:30', loc: 'Weight Room', spots: 24, going: 19, desc: 'Weigh-in at 15:00. Three attempts each, sleeves or wraps allowed. New PRs get announced. Bring a spotter.' },
-      { id: 3, name: 'Pull-Up Ladder', kind: 'Calisthenics', date: this.iso(13), time: '16:00', loc: 'Small Gym', spots: 16, going: 16, desc: 'Bracket format, strict form only — no kipping. Bodyweight classes so it stays fair.' },
+      { id: 3, name: 'Pull-Up Ladder', kind: 'Bodyweight', date: this.iso(13), time: '16:00', loc: 'Small Gym', spots: 16, going: 16, desc: 'Bracket format, strict form only — no kipping. Bodyweight classes so it stays fair.' },
       { id: 4, name: 'Guest Speaker: Provincial Champ', kind: 'Guest Speaker', date: this.iso(20), time: '15:15', loc: 'Room 214', spots: 40, going: 12, desc: 'Ontario 83kg record holder on programming a school-year training block. Q&A after.' }
     ];
   }
@@ -1216,7 +1216,7 @@ class Component extends DCLogic {
       })),
       feedCards: feed === 'Cards', feedBulletin: feed === 'Bulletin',
 
-      filters: ['All', 'Powerlifting', 'Calisthenics', 'Open Lift', 'Guest Speaker'].map(f => ({
+      filters: ['All', 'Powerlifting', 'Bodyweight', 'Open Lift', 'Guest Speaker', 'Info Session'].map(f => ({
         label: f, active: s.filter === f, go: () => this.setState({ filter: f })
       })),
       events: fEvents,
@@ -1286,7 +1286,7 @@ class Component extends DCLogic {
       evSub: s.editEventId ? 'Changes show on every member\u2019s schedule right away.' : 'It hits the schedule immediately.',
       evCta: s.editEventId ? 'Save changes' : 'Publish event',
 
-      kinds: ['Powerlifting', 'Calisthenics', 'Open Lift', 'Guest Speaker'],
+      kinds: ['Powerlifting', 'Bodyweight', 'Open Lift', 'Guest Speaker', 'Info Session'],
       evName: s.evName, evDate: s.evDate, evTime: s.evTime, evKind: s.evKind, evLoc: s.evLoc, evSpots: s.evSpots, evDesc: s.evDesc,
       setEvName: e => this.setState({ evName: e.target.value }),
       setEvDate: e => this.setState({ evDate: e.target.value }),

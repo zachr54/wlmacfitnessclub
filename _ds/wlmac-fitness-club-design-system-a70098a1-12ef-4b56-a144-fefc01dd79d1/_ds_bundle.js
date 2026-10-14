@@ -659,7 +659,7 @@ function EventsScreen({
   } = window.WLMACFitnessClubDesignSystem_a70098;
   const [when, setWhen] = React.useState('Upcoming');
   const [filter, setFilter] = React.useState('All');
-  const types = ['All', 'Powerlifting Meet', 'Open Lifting', 'Guest Speaker', 'Calisthenics Meet'];
+  const types = ['All', 'Powerlifting Meet', 'Open Lifting', 'Guest Speaker', 'Bodyweight Meet'];
   const list = window.WLMAC_EVENTS.filter(e => e.when === (when === 'Upcoming' ? 'upcoming' : 'past')).filter(e => filter === 'All' || e.type === filter);
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -788,7 +788,7 @@ function HomeScreen({
       lineHeight: 1.5,
       margin: 0
     }
-  }, "Monthly powerlifting and calisthenics meets, weekly open lifting, and the occasional guest speaker who's actually done it."), /*#__PURE__*/React.createElement("div", {
+  }, "Monthly powerlifting and bodyweight meets, weekly open lifting, and the occasional guest speaker who's actually done it."), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 14
@@ -877,7 +877,7 @@ function HomeScreen({
     }
   }, /*#__PURE__*/React.createElement(Tag, {
     active: true
-  }, "Powerlifting"), /*#__PURE__*/React.createElement(Tag, null, "Calisthenics"), /*#__PURE__*/React.createElement(Tag, null, "Open Lift"))), /*#__PURE__*/React.createElement("div", {
+  }, "Powerlifting"), /*#__PURE__*/React.createElement(Tag, null, "Bodyweight"), /*#__PURE__*/React.createElement(Tag, null, "Open Lift"))), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
       display: 'flex',
@@ -1055,9 +1055,9 @@ function SignUpScreen() {
     checked: track === 'pl',
     onChange: () => setTrack('pl')
   }), /*#__PURE__*/React.createElement(Radio, {
-    label: "Calisthenics",
-    checked: track === 'cal',
-    onChange: () => setTrack('cal')
+    label: "Bodyweight",
+    checked: track === 'bw',
+    onChange: () => setTrack('bw')
   }), /*#__PURE__*/React.createElement(Radio, {
     label: "Both / Not sure",
     checked: track === 'both',
@@ -1105,7 +1105,7 @@ const EVENTS = [{
   spotsLeft: 12,
   when: 'upcoming'
 }, {
-  type: 'Calisthenics Meet',
+  type: 'Bodyweight Meet',
   title: 'Bar Skills Showcase',
   date: 'Sep 20',
   location: 'Gym Annex',

@@ -220,3 +220,12 @@ create policy "checkins_update_self" on public.checkins for update
     auth.uid() = profile_id
     and (checked_in = false or exists (select 1 from public.room_state where id = 1 and is_open))
   );
+
+-- ---------- event types: Calisthenics is now Bodyweight; Info Session added ----------
+-- Already ran the file above? Run just this section in the SQL Editor.
+-- (Event types are free text, so Info Session needs no database change.)
+update public.events set kind = 'Bodyweight' where kind = 'Calisthenics';
+
+-- Powerlifting events are linked to WLMAC Meet (meets and sign-ups sync both ways).
+-- That link lives in the wlmac-meet repo: run the "club app link" section of its
+-- supabase/schema.sql after this file.
